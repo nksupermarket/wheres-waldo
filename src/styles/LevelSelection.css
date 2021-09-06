@@ -1,0 +1,29 @@
+#level-selection-ctn {
+  width: 40%;
+  height: 50%;
+  display: flex;
+  overflow: hidden;
+}
+#level-selection-ctn button {
+  z-index: 3;
+}
+.frame {
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+}
+.slider {
+  display: flex;
+  align-items: center;
+}
+.slider-slide {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+.slider-slide img {
+  width: 300px;
+  height: auto;
+}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import LevelSelection from './components/LevelSelection';
+import Level from './components/Level';
 
 function App() {
   const [level, setLevel] = useState();
