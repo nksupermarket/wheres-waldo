@@ -1,0 +1,19 @@
+body {
+  margin: 0;
+}
+button {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+#root {
+  min-width: 100vw;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}

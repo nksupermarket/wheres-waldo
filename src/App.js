@@ -3,14 +3,16 @@ import React, { useState } from 'react';
 import LevelSelection from './components/LevelSelection';
 import Level from './components/Level';
 
+import './globalStyles.css';
+
 function App() {
   const [level, setLevel] = useState();
 
   return (
-    <div className="App">
+    <React.Fragment>
       {!level && <LevelSelection setLevel={setLevel} />}
       {level && <Level level={level.img} />}
-    </div>
+    </React.Fragment>
   );
 }
 
