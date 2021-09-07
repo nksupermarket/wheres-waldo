@@ -27,23 +27,41 @@ const LevelSelection = ({ setLevel }) => {
 
   const [springProps, springPropsRef] = useSprings(levels.length, (index) => ({
     offset: index,
+    config: {
+      friction: 40,
+    },
   }));
   const [bgProps, bgPropsRef] = useSprings(levels.length, (index) => ({
-    offset: index,
+    opacity: 0,
+    config: {
+      friction: 80,
+    },
   }));
   // when user clicks slider btn
   useEffect(() => {
     springPropsRef.update((index) => ({ offset: index - slide })).start();
-    bgPropsRef.update((index) => ({ offset: index - slide })).start();
+    bgPropsRef
+      .update((index) => {
+        if (index === slide) return { opacity: 1 };
+        return { opacity: 0 };
+      })
+      .start();
   }, [slide, springPropsRef, bgPropsRef]);
 
-  // get width of preview container so we know how big slide needs to be/how many px slide needs to slide
+  // get width of preview container so we know how big slide needs to be/how many px it needs to slide
   const [width, setWidth] = useState();
 
   const previewRef = useRef();
   useEffect(() => {
     const previewEl = previewRef.current ? previewRef.current : null;
-    if (width !== previewEl.offsetWidth) setWidth(previewEl.offsetWidth);
+    if (width !== previewEl.offsetWidth) setNewWidth();
+
+    window.addEventListener('resize', setNewWidth);
+    return () => window.removeEventListener('resize', setNewWidth);
+
+    function setNewWidth() {
+      setWidth(previewEl.offsetWidth);
+    }
   });
 
   /* event listeners */
@@ -63,25 +81,14 @@ const LevelSelection = ({ setLevel }) => {
 
   return (
     <React.Fragment>
-      <div ref={previewRef} id="bg-frame" className="frame">
-        {bgProps.map(({ offset }, index) => {
-          console.log(`url(${levels[index]})`);
+      <div id="bg-frame" className="frame">
+        {bgProps.map((style, index) => {
+          const bgImage = { backgroundImage: `url(${levels[index]})` };
           return (
             <animated.div
               key={index}
               className="slider-slide"
-              style={{
-                transform: offset.to(
-                  (offsetX) => `translate3d(${offsetX * 100}%, 0, 0)`
-                ),
-                width: `100%`,
-                height: '100%',
-                willChange: 'transform',
-                backgroundImage: `url(${levels[index]})`,
-                backgroundSize: 'cover',
-                backgroundRepeat: 'no-repeat',
-                position: 'absolute',
-              }}
+              style={{ ...style, ...bgImage }}
             ></animated.div>
           );
         })}
@@ -97,16 +104,20 @@ const LevelSelection = ({ setLevel }) => {
               <i className="nav-btn"></i>
             </button>
           </div>
-          <div ref={previewRef} className="frame">
+          <div
+            ref={previewRef}
+            className="frame"
+            onClick={() => setLevel(slide)}
+          >
             {springProps.map(({ offset }, index) => {
               return (
                 <animated.div
                   key={index}
                   className="slider-slide"
                   style={{
-                    transform: offset.to(
-                      (offsetX) => `translate3d(${offsetX * width}px, 0, 0)`
-                    ),
+                    transform: offset.to((offsetX) => {
+                      return `translate3d(${offsetX * width}px, 0, 0)`;
+                    }),
                     position: 'absolute',
                     width: `${width}px`,
                     height: 'auto',
@@ -129,3 +140,4 @@ LevelSelection.propTypes = {
 };
 
 export default LevelSelection;
+export { levels };

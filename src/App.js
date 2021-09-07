@@ -10,8 +10,8 @@ function App() {
 
   return (
     <React.Fragment>
-      {!level && <LevelSelection setLevel={setLevel} />}
-      {level && <Level level={level.img} />}
+      {!level && level !== 0 && <LevelSelection setLevel={setLevel} />}
+      {level || (level === 0 && <Level level={level} />)}
     </React.Fragment>
   );
 }

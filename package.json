@@ -45,6 +45,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-react": "^7.25.1",
+    "firebase": "^9.0.1",
     "prettier": "^2.3.2"
   }
 }
