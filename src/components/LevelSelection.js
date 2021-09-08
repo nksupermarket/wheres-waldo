@@ -13,13 +13,13 @@ import levelSix from '../assets/levels/wheres-waldo-5.jpeg';
 import levelSeven from '../assets/levels/wheres-waldo-6.jpeg';
 
 const levels = [
-  levelOne,
-  levelTwo,
-  levelThree,
-  levelFour,
-  levelFive,
-  levelSix,
-  levelSeven,
+  { img: levelOne, char: ['waldo', 'wenda', 'woof', 'wizard', 'odlaw'] },
+  { img: levelTwo, char: [] },
+  { img: levelThree, char: [] },
+  { img: levelFour, char: [] },
+  { img: levelFive, char: [] },
+  { img: levelSix, char: [] },
+  { img: levelSeven, char: [] },
 ];
 
 const LevelSelection = ({ setLevel }) => {
@@ -83,7 +83,7 @@ const LevelSelection = ({ setLevel }) => {
     <React.Fragment>
       <div id="bg-frame" className="frame">
         {bgProps.map((style, index) => {
-          const bgImage = { backgroundImage: `url(${levels[index]})` };
+          const bgImage = { backgroundImage: `url(${levels[index].img})` };
           return (
             <animated.div
               key={index}
@@ -124,7 +124,7 @@ const LevelSelection = ({ setLevel }) => {
                     willChange: 'transform',
                   }}
                 >
-                  <img src={levels[index]} />
+                  <img src={levels[index].img} />
                 </animated.div>
               );
             })}
