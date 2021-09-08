@@ -21,10 +21,10 @@ const CharPopup = ({ chars, pos }) => {
   return (
     <div
       id="char-popup"
-      style={{
-        top: pos.y,
-        left: pos.x,
-      }}
+      // style={{
+      //   top: pos.y,
+      //   left: pos.x,
+      // }}
     >
       {chars.map((char) => {
         return (

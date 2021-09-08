@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { levels } from './LevelSelection';
 import CharPopup from './CharPopup';
+import SelectionBox from './SelectionBox';
 
 import '../styles/Level.css';
 
@@ -10,17 +11,34 @@ const Level = ({ level }) => {
   const [isPopup, setIsPopup] = useState(false);
   const [popupPos, setPopupPos] = useState();
 
-  useEffect(() => {
-    imgRef.current.addEventListener('dblclick', (e) => showCharPopup(e));
+  const imgRef = useRef();
 
-    return imgRef.current.removeEventListener('dblclick', showCharPopup);
+  useEffect(() => {
+    ctnRef.current.addEventListener('dblclick', showSelection);
+    ctnRef.current.addEventListener('click', hideSelection);
+
+    return () => {
+      ctnRef.current.removeEventListener('dblclick', showSelection);
+      ctnRef.current.removeEventListener('click', hideSelection);
+    };
   });
-  function showCharPopup(e) {
+  function showSelection(e) {
     setPopupPos({ x: e.clientX, y: e.clientY });
     setIsPopup(true);
   }
+  function hideSelection() {
+    if (!isPopup) return;
+    setIsPopup(false);
+    setPopupPos();
+  }
 
-  const imgRef = useRef();
+  useEffect(() => {
+    if (!isPopup) return;
+
+    console.log(imgRef.current.scrollWidth, ctnRef.current.scrollWidth);
+  });
+
+  const ctnRef = useRef();
   useEffect(() => {
     window.addEventListener('mousedown', dragToScroll.mouseDownHandler);
     window.addEventListener('mousemove', dragToScroll.mouseMoveHandler);
@@ -38,15 +56,17 @@ const Level = ({ level }) => {
   let isDown = false;
   const dragToScroll = {
     mouseDownHandler: (e) => {
+      hideSelection();
+
       e.preventDefault();
       // get current position
       startPos = {
-        top: imgRef.current.scrollTop,
-        left: imgRef.current.scrollLeft,
+        top: ctnRef.current.scrollTop,
+        left: ctnRef.current.scrollLeft,
         x: e.clientX,
         y: e.clientY,
       };
-      imgRef.current.style.cursor = 'grabbing';
+      ctnRef.current.style.cursor = 'grabbing';
 
       isDown = true;
     },
@@ -58,31 +78,44 @@ const Level = ({ level }) => {
 
       const dx = e.clientX - startPos.x;
       const dy = e.clientY - startPos.y;
-      imgRef.current.scrollLeft = startPos.left - dx;
-      imgRef.current.scrollTop = startPos.top - dy;
+      ctnRef.current.scrollLeft = startPos.left - dx;
+      ctnRef.current.scrollTop = startPos.top - dy;
     },
     mouseUpHandler: () => {
       isDown = false;
-      imgRef.current.style.cursor = 'grab';
+      ctnRef.current.style.cursor = 'grab';
     },
     mouseLeaveHandler: () => {
       isDown = false;
-      imgRef.current.style.cursor = 'grab';
+      ctnRef.current.style.cursor = 'grab';
     },
   };
 
+  const selectionBoxRadius = 25;
+
   return (
     <React.Fragment>
-      <div id="game-ctn" ref={imgRef}>
-        <img src={levels[level].img} />
+      <div id="game-ctn" ref={ctnRef}>
+        <img ref={imgRef} src={levels[level].img} />
       </div>
-      {isPopup && <CharPopup chars={levels[level].char} pos={popupPos} />}
+      {isPopup && (
+        <div
+          id="selection"
+          style={{
+            top: popupPos.y - selectionBoxRadius,
+            left: popupPos.x - selectionBoxRadius,
+          }}
+        >
+          <SelectionBox />
+          <CharPopup chars={levels[level].char} />
+        </div>
+      )}
     </React.Fragment>
   );
 };
 Level.propTypes = {
   level: PropTypes.number,
-  imgRef: PropTypes.object,
+  ctnRef: PropTypes.object,
 };
 
 export default Level;
