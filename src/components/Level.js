@@ -1,29 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSpring, animated } from 'react-spring';
 import PropTypes from 'prop-types';
 
+import Nav from './Nav';
 import { levels } from './LevelSelection';
 import CharPopup from './CharPopup';
 import SelectionBox from './SelectionBox';
 
 import '../styles/Level.css';
 
-const Level = ({ level }) => {
+const Level = ({ level, goBack }) => {
   const [isPopup, setIsPopup] = useState(false);
   const [popupPos, setPopupPos] = useState();
+
+  const springStyle = useSpring({ opacity: isPopup ? 1 : 0 });
 
   const imgRef = useRef();
 
   useEffect(() => {
     ctnRef.current.addEventListener('dblclick', showSelection);
     ctnRef.current.addEventListener('click', hideSelection);
-
-    return () => {
-      ctnRef.current.removeEventListener('dblclick', showSelection);
-      ctnRef.current.removeEventListener('click', hideSelection);
-    };
   });
   function showSelection(e) {
     setPopupPos({ x: e.clientX, y: e.clientY });
+    console.log(e, e.layerX, e.layerY);
     setIsPopup(true);
   }
   function hideSelection() {
@@ -31,12 +31,6 @@ const Level = ({ level }) => {
     setIsPopup(false);
     setPopupPos();
   }
-
-  useEffect(() => {
-    if (!isPopup) return;
-
-    console.log(imgRef.current.scrollWidth, ctnRef.current.scrollWidth);
-  });
 
   const ctnRef = useRef();
   useEffect(() => {
@@ -91,31 +85,34 @@ const Level = ({ level }) => {
     },
   };
 
-  const selectionBoxRadius = 25;
+  const selectionBoxRadius = 55;
 
   return (
     <React.Fragment>
+      <Nav goBack={goBack} />
       <div id="game-ctn" ref={ctnRef}>
         <img ref={imgRef} src={levels[level].img} />
       </div>
       {isPopup && (
-        <div
-          id="selection"
-          style={{
-            top: popupPos.y - selectionBoxRadius,
-            left: popupPos.x - selectionBoxRadius,
-          }}
-        >
-          <SelectionBox />
-          <CharPopup chars={levels[level].char} />
-        </div>
+        <animated.div className="modal" style={springStyle}>
+          <div
+            id="selection"
+            style={{
+              top: popupPos.y - selectionBoxRadius,
+              left: popupPos.x - selectionBoxRadius,
+            }}
+          >
+            <SelectionBox />
+            <CharPopup chars={levels[level].char} />
+          </div>
+        </animated.div>
       )}
     </React.Fragment>
   );
 };
 Level.propTypes = {
   level: PropTypes.number,
-  ctnRef: PropTypes.object,
+  goBack: PropTypes.func,
 };
 
 export default Level;

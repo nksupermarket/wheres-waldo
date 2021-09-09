@@ -11,7 +11,9 @@ function App() {
   return (
     <React.Fragment>
       {!level && level !== 0 && <LevelSelection setLevel={setLevel} />}
-      {level || (level === 0 && <Level level={level} />)}
+      {typeof level === 'number' && (
+        <Level level={level} goBack={() => setLevel()} />
+      )}
     </React.Fragment>
   );
 }

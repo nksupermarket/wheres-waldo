@@ -13,8 +13,8 @@ import levelSix from '../assets/levels/wheres-waldo-5.jpeg';
 import levelSeven from '../assets/levels/wheres-waldo-6.jpeg';
 
 const levels = [
-  { img: levelOne, char: ['waldo', 'wenda', 'woof', 'wizard', 'odlaw'] },
-  { img: levelTwo, char: [] },
+  { img: levelOne, char: ['waldo', 'wenda', 'odlaw'] },
+  { img: levelTwo, char: ['waldo', 'wenda', 'odlaw'] },
   { img: levelThree, char: [] },
   { img: levelFour, char: [] },
   { img: levelFive, char: [] },
@@ -31,7 +31,7 @@ const LevelSelection = ({ setLevel }) => {
       friction: 40,
     },
   }));
-  const [bgProps, bgPropsRef] = useSprings(levels.length, (index) => ({
+  const [bgProps, bgPropsRef] = useSprings(levels.length, () => ({
     opacity: 0,
     config: {
       friction: 80,
@@ -96,14 +96,15 @@ const LevelSelection = ({ setLevel }) => {
       <div id="level-selection-ctn">
         <p>Select a level</p>
         <div className="slider">
-          <div className="btn-ctn">
-            <button id="left-nav-btn" type="button" onClick={prevSlide}>
-              <i className="nav-btn"></i>
-            </button>
-            <button id="right-nav-btn" type="button" onClick={nextSlide}>
-              <i className="nav-btn"></i>
-            </button>
-          </div>
+          <button
+            id="left-nav-btn"
+            className="nav-btn"
+            type="button"
+            onClick={prevSlide}
+          >
+            <i></i>
+          </button>
+
           <div
             ref={previewRef}
             className="frame"
@@ -129,6 +130,14 @@ const LevelSelection = ({ setLevel }) => {
               );
             })}
           </div>
+          <button
+            id="right-nav-btn"
+            className="nav-btn"
+            type="button"
+            onClick={nextSlide}
+          >
+            <i></i>
+          </button>
         </div>
       </div>
     </React.Fragment>
@@ -136,7 +145,7 @@ const LevelSelection = ({ setLevel }) => {
 };
 
 LevelSelection.propTypes = {
-  setLevel: PropTypes.function,
+  setLevel: PropTypes.func,
 };
 
 export default LevelSelection;

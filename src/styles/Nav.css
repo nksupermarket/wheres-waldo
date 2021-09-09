@@ -1,0 +1,15 @@
+nav {
+  position: fixed;
+  top: 0;
+  height: 50px;
+  background: white;
+  width: 100%;
+}
+
+nav img {
+  height: 100%;
+  cursor: pointer;
+  display: block;
+  padding: 5px 10px;
+  box-sizing: border-box;
+}

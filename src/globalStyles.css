@@ -16,9 +16,17 @@ button {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  overflow: hidden;
 }
 
 #selection {
   position: absolute;
+}
+
+.modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.2);
 }
