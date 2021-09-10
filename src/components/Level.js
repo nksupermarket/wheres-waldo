@@ -15,10 +15,9 @@ const Level = ({ level, goBack }) => {
   const [isPopup, setIsPopup] = useState(false);
   const [popupPos, setPopupPos] = useState();
   const [clickPos, setClickPos] = useState();
+  const [selectedChars, setSelectedChars] = useState([]);
 
   const springStyle = useSpring({ opacity: isPopup ? 1 : 0 });
-
-  const imgRef = useRef();
 
   useEffect(() => {
     ctnRef.current.addEventListener('dblclick', showSelection);
@@ -29,7 +28,6 @@ const Level = ({ level, goBack }) => {
     setIsPopup(true);
   }
   function hideSelection() {
-    console.log('hi');
     if (!isPopup) return;
     setIsPopup(false);
     setPopupPos();
@@ -103,20 +101,31 @@ const Level = ({ level, goBack }) => {
       isInBetween(selectionRange.xMin, selectionRange.xMax, answerX) &&
       isInBetween(selectionRange.yMin, selectionRange.yMax, answerY)
     )
-      return true;
+      return onValid();
 
-    return false;
+    return onInvalid();
 
+    // helper functions
     function isInBetween(min, max, num) {
       return num >= min && num <= max;
     }
+
+    function onValid() {
+      setSelectedChars((prev) => [...prev, char]);
+    }
+
+    function onInvalid() {}
   }
 
   return (
     <React.Fragment>
-      <Nav goBack={goBack} />
+      <Nav
+        goBack={goBack}
+        charList={levels[level].char}
+        selectedChars={selectedChars}
+      />
       <div id="game-ctn" ref={ctnRef}>
-        <img ref={imgRef} src={levels[level].img} />
+        <img src={levels[level].img} />
       </div>
       {isPopup && (
         <animated.div

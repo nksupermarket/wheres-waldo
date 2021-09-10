@@ -94,12 +94,11 @@
   max-width: 500px;
   height: auto;
 }
-.char-list {
+#level-selection-ctn .char-list {
   position: absolute;
   bottom: -75px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
 }
 .char-list img {
   display: inline-block;
