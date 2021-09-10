@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import logo from '../assets/Wheres_Waldo_-_Logo.png';
+import { logo } from '../imgSrc';
 
 import '../styles/Nav.css';
 

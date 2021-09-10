@@ -7,11 +7,14 @@ import { levels } from './LevelSelection';
 import CharPopup from './CharPopup';
 import SelectionBox from './SelectionBox';
 
+import { pullAnswers } from '../firebaseStuff.js';
+
 import '../styles/Level.css';
 
 const Level = ({ level, goBack }) => {
   const [isPopup, setIsPopup] = useState(false);
   const [popupPos, setPopupPos] = useState();
+  const [clickPos, setClickPos] = useState();
 
   const springStyle = useSpring({ opacity: isPopup ? 1 : 0 });
 
@@ -22,6 +25,7 @@ const Level = ({ level, goBack }) => {
     ctnRef.current.addEventListener('click', hideSelection);
   });
   function showSelection(e) {
+    setClickPos([e.layerX, e.layerY]);
     setPopupPos({ x: e.clientX, y: e.clientY });
     console.log(e, e.layerX, e.layerY);
     setIsPopup(true);
@@ -87,6 +91,32 @@ const Level = ({ level, goBack }) => {
 
   const selectionBoxRadius = 55;
 
+  function validate(char) {
+    const [answerX, answerY] = pullAnswers(level)[char];
+    const [clickX, clickY] = clickPos;
+    const selectionRange = {
+      xMin: clickX - selectionBoxRadius,
+      xMax: clickX + selectionBoxRadius,
+      yMin: clickY - selectionBoxRadius,
+      yMax: clickY + selectionBoxRadius,
+    };
+    console.log(
+      isInBetween(selectionRange.xMin, selectionRange.xMax, answerX) &&
+        isInBetween(selectionRange.yMin, selectionRange.yMay, answerY)
+    );
+    if (
+      isInBetween(selectionRange.xMin, selectionRange.xMax, answerX) &&
+      isInBetween(selectionRange.yMin, selectionRange.yMay, answerY)
+    )
+      return true;
+
+    return false;
+
+    function isInBetween(min, max, num) {
+      return num >= min && num <= max;
+    }
+  }
+
   return (
     <React.Fragment>
       <Nav goBack={goBack} />
@@ -103,7 +133,7 @@ const Level = ({ level, goBack }) => {
             }}
           >
             <SelectionBox />
-            <CharPopup chars={levels[level].char} />
+            <CharPopup chars={levels[level].char} validate={validate} />
           </div>
         </animated.div>
       )}

@@ -3,32 +3,14 @@ import PropTypes from 'prop-types';
 
 import '../styles/CharPopup.css';
 
-import waldo from '../assets/characters/waldo.png';
-import wenda from '../assets/characters/gf.png';
-import woof from '../assets/characters/dog.png';
-import wizard from '../assets/characters/wizard.png';
-import odlaw from '../assets/characters/evil_waldo.png';
+import { charcImg } from '../imgSrc';
 
-const charcImg = {
-  waldo,
-  wenda,
-  woof,
-  wizard,
-  odlaw,
-};
-
-const CharPopup = ({ chars, pos }) => {
+const CharPopup = ({ chars, validate }) => {
   return (
-    <div
-      id="char-popup"
-      // style={{
-      //   top: pos.y,
-      //   left: pos.x,
-      // }}
-    >
+    <div id="char-popup">
       {chars.map((char) => {
         return (
-          <div className="char" key={char}>
+          <div className="char" key={char} onClick={() => validate(char)}>
             <img src={charcImg[char]} />
           </div>
         );
@@ -38,7 +20,7 @@ const CharPopup = ({ chars, pos }) => {
 };
 CharPopup.propTypes = {
   chars: PropTypes.array,
-  pos: PropTypes.object,
+  validate: PropTypes.func,
 };
 
 export default CharPopup;

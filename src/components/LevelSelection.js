@@ -4,23 +4,7 @@ import { useSprings, animated } from 'react-spring';
 
 import '../styles/LevelSelection.css';
 
-import levelOne from '../assets/levels/1*7v_75ZGg1CTmWAw1rEgMHQ.jpeg';
-import levelTwo from '../assets/levels/wheres-waldo-1.jpeg';
-import levelThree from '../assets/levels/wheres-waldo-2.jpeg';
-import levelFour from '../assets/levels/wheres-waldo-3.jpeg';
-import levelFive from '../assets/levels/wheres-waldo-4.jpeg';
-import levelSix from '../assets/levels/wheres-waldo-5.jpeg';
-import levelSeven from '../assets/levels/wheres-waldo-6.jpeg';
-
-const levels = [
-  { img: levelOne, char: ['waldo', 'wenda', 'odlaw'] },
-  { img: levelTwo, char: ['waldo', 'wenda', 'odlaw'] },
-  { img: levelThree, char: [] },
-  { img: levelFour, char: [] },
-  { img: levelFive, char: [] },
-  { img: levelSix, char: [] },
-  { img: levelSeven, char: [] },
-];
+import { levels, charcImg, logo } from '../imgSrc';
 
 const LevelSelection = ({ setLevel }) => {
   const [slide, setSlide] = useState(0);
@@ -50,17 +34,21 @@ const LevelSelection = ({ setLevel }) => {
 
   // get width of preview container so we know how big slide needs to be/how many px it needs to slide
   const [width, setWidth] = useState();
+  const [btnWidth, setBtnWidth] = useState();
 
+  const btnRef = useRef();
   const previewRef = useRef();
   useEffect(() => {
-    const previewEl = previewRef.current ? previewRef.current : null;
-    if (width !== previewEl.offsetWidth) setNewWidth();
+    if (width !== previewRef.current.offsetWidth) setNewWidth();
+
+    setBtnWidth(btnRef.current.offsetWidth);
+    console.log(btnWidth);
 
     window.addEventListener('resize', setNewWidth);
     return () => window.removeEventListener('resize', setNewWidth);
 
     function setNewWidth() {
-      setWidth(previewEl.offsetWidth);
+      setWidth(previewRef.current.offsetWidth);
     }
   });
 
@@ -94,6 +82,7 @@ const LevelSelection = ({ setLevel }) => {
         })}
       </div>
       <div id="level-selection-ctn">
+        <img src={logo} alt="wheres waldo" height="80px" />
         <p>Select a level</p>
         <div className="slider">
           <button
@@ -117,7 +106,10 @@ const LevelSelection = ({ setLevel }) => {
                   className="slider-slide"
                   style={{
                     transform: offset.to((offsetX) => {
-                      return `translate3d(${offsetX * width}px, 0, 0)`;
+                      console.log(offsetX * width, btnWidth);
+                      return `translate3d(${
+                        offsetX * (width + btnWidth)
+                      }px, 0, 0)`;
                     }),
                     position: 'absolute',
                     width: `${width}px`,
@@ -125,12 +117,22 @@ const LevelSelection = ({ setLevel }) => {
                     willChange: 'transform',
                   }}
                 >
-                  <img src={levels[index].img} />
+                  <div className="char-list">
+                    {levels[index].char.map((name) => {
+                      const img = charcImg[name];
+                      return <img key={name} src={img} alt="name" />;
+                    })}
+                  </div>
+                  <img
+                    src={levels[index].img}
+                    style={{ width: `${width}px` }}
+                  />
                 </animated.div>
               );
             })}
           </div>
           <button
+            ref={btnRef}
             id="right-nav-btn"
             className="nav-btn"
             type="button"
