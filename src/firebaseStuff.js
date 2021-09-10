@@ -1,6 +1,5 @@
-import * as firebase from 'firebase';
 import { initializeApp } from 'firebase/app';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 
 (function init() {
   const config = {
@@ -10,8 +9,11 @@ import { collection, addDoc, getDocs } from 'firebase/firestore';
   };
   initializeApp(config);
 
-  (function uploadAnswers() {
-    const db = firebase.firestore();
+  (async function uploadAnswers() {
+    const db = getFirestore();
+    const answer = await getDoc(doc(db, 'answers', '0'));
+    if (answer.exists()) return;
+
     const answers = [
       { waldo: [475, 1548], wenda: [2141, 1395], odlaw: [2446, 1504] },
       {
@@ -56,16 +58,19 @@ import { collection, addDoc, getDocs } from 'firebase/firestore';
       },
     ];
 
-    if (!getDocs(collection(db, 'answers')))
-      addDoc(collection(db, 'answers'), answers);
+    answers.forEach((answer, index) =>
+      setDoc(doc(db, 'answers', `${index}`), answer)
+    );
+
+    console.log('success');
   })();
 })();
 
 async function pullAnswers(level) {
-  const db = firebase.firestore();
+  const db = getFirestore();
 
-  const answers = await getDocs(getDocs(collection(db, 'answers')));
-  return answers[level];
+  const answers = await getDoc(doc(db, 'answers', `${level}`));
+  if (answers.exists()) return answers.data();
 }
 
 export { pullAnswers };

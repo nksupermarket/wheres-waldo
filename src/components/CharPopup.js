@@ -10,7 +10,14 @@ const CharPopup = ({ chars, validate }) => {
     <div id="char-popup">
       {chars.map((char) => {
         return (
-          <div className="char" key={char} onClick={() => validate(char)}>
+          <div
+            className="char"
+            key={char}
+            onClick={(e) => {
+              e.stopPropagation();
+              validate(char);
+            }}
+          >
             <img src={charcImg[char]} />
           </div>
         );

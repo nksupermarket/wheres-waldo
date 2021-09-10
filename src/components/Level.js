@@ -22,15 +22,14 @@ const Level = ({ level, goBack }) => {
 
   useEffect(() => {
     ctnRef.current.addEventListener('dblclick', showSelection);
-    ctnRef.current.addEventListener('click', hideSelection);
   });
   function showSelection(e) {
     setClickPos([e.layerX, e.layerY]);
     setPopupPos({ x: e.clientX, y: e.clientY });
-    console.log(e, e.layerX, e.layerY);
     setIsPopup(true);
   }
   function hideSelection() {
+    console.log('hi');
     if (!isPopup) return;
     setIsPopup(false);
     setPopupPos();
@@ -54,8 +53,6 @@ const Level = ({ level, goBack }) => {
   let isDown = false;
   const dragToScroll = {
     mouseDownHandler: (e) => {
-      hideSelection();
-
       e.preventDefault();
       // get current position
       startPos = {
@@ -91,8 +88,9 @@ const Level = ({ level, goBack }) => {
 
   const selectionBoxRadius = 55;
 
-  function validate(char) {
-    const [answerX, answerY] = pullAnswers(level)[char];
+  async function validate(char) {
+    const answers = await pullAnswers(level);
+    const [answerX, answerY] = answers[char];
     const [clickX, clickY] = clickPos;
     const selectionRange = {
       xMin: clickX - selectionBoxRadius,
@@ -100,13 +98,10 @@ const Level = ({ level, goBack }) => {
       yMin: clickY - selectionBoxRadius,
       yMax: clickY + selectionBoxRadius,
     };
-    console.log(
-      isInBetween(selectionRange.xMin, selectionRange.xMax, answerX) &&
-        isInBetween(selectionRange.yMin, selectionRange.yMay, answerY)
-    );
+
     if (
       isInBetween(selectionRange.xMin, selectionRange.xMax, answerX) &&
-      isInBetween(selectionRange.yMin, selectionRange.yMay, answerY)
+      isInBetween(selectionRange.yMin, selectionRange.yMax, answerY)
     )
       return true;
 
@@ -124,7 +119,11 @@ const Level = ({ level, goBack }) => {
         <img ref={imgRef} src={levels[level].img} />
       </div>
       {isPopup && (
-        <animated.div className="modal" style={springStyle}>
+        <animated.div
+          className="modal"
+          style={springStyle}
+          onClick={hideSelection}
+        >
           <div
             id="selection"
             style={{

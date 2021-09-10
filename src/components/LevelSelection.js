@@ -42,7 +42,6 @@ const LevelSelection = ({ setLevel }) => {
     if (width !== previewRef.current.offsetWidth) setNewWidth();
 
     setBtnWidth(btnRef.current.offsetWidth);
-    console.log(btnWidth);
 
     window.addEventListener('resize', setNewWidth);
     return () => window.removeEventListener('resize', setNewWidth);
@@ -106,7 +105,6 @@ const LevelSelection = ({ setLevel }) => {
                   className="slider-slide"
                   style={{
                     transform: offset.to((offsetX) => {
-                      console.log(offsetX * width, btnWidth);
                       return `translate3d(${
                         offsetX * (width + btnWidth)
                       }px, 0, 0)`;
