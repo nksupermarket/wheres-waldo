@@ -26,3 +26,14 @@ nav .char-list img {
   padding: 3px;
   box-sizing: border-box;
 }
+
+.char-ctn {
+  display: grid;
+  place-items: center;
+}
+
+.char-ctn i {
+  position: absolute;
+  font-size: 30px;
+  color: #77b255;
+}

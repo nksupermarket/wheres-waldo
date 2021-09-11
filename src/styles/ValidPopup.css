@@ -1,0 +1,22 @@
+#valid-popup {
+  position: absolute;
+  top: 100px;
+  padding: 0.5em 1.5em;
+  border-radius: 10px;
+  background: white;
+  z-index: 2;
+  text-align: center;
+}
+
+.valid-msg i {
+  position: relative;
+  top: 2px;
+}
+
+.valid-msg .flaticon-draw-check-mark {
+  color: #77b255;
+}
+
+.valid-msg .flaticon-close {
+  color: tomato;
+}
