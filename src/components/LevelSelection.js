@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useSprings, animated } from 'react-spring';
+import { useSpring, useSprings, animated } from 'react-spring';
 
 import '../styles/LevelSelection.css';
 
@@ -21,18 +21,17 @@ const LevelSelection = ({ setLevel }) => {
   // });
 
   const { frameWidth, btnWidth } = useMeasurements();
-
+  console.log(btnWidth);
   function useMeasurements() {
     const [frameWidth, setFrameWidth] = useState();
     const [btnWidth, setBtnWidth] = useState();
 
     useEffect(() => {
-      setFrameWidth(previewRef.current.offsetWidth);
-      setBtnWidth(btnRef.current.offsetWidth);
-      console.log(
-        previewRef.current.offsetWidth,
-        sliderRef.current.offsetHeight
+      setFrameWidth(
+        previewRef.current.offsetWidth - 2 * btnRef.current.offsetWidth
       );
+      setBtnWidth(btnRef.current.offsetWidth);
+
       window.addEventListener('resize', setNewFrameWidth);
       return () => window.removeEventListener('resize', setNewFrameWidth);
 
@@ -67,53 +66,58 @@ const LevelSelection = ({ setLevel }) => {
             className="nav-btn"
             type="button"
             onClick={prevSlide}
+            style={getNavBtnStyle(slide, 'left')}
           >
             <i></i>
           </button>
 
-          <div
+          <animated.div
             ref={previewRef}
             className="frame"
             onClick={() => setLevel(slide)}
+            style={{
+              transform: slideProps.offset.to(
+                (offsetX) => `translate3d(${offsetX * frameWidth}px, 0, 0)`
+              ),
+              willChange: 'transform',
+              marginLeft: `${btnWidth}px`,
+            }}
           >
-            {slideProps.map(({ offset }, index) => {
+            {levels.map((level, index) => {
+              console.log(slideProps);
               return (
-                <animated.div
+                <div
                   key={index}
                   className="slider-slide"
                   ref={sliderRef}
                   style={{
-                    transform: offset.to((offsetX) => {
-                      return `translate3d(${
-                        offsetX * (frameWidth + btnWidth)
-                      }px, 0, 0)`;
-                    }),
-                    position: 'absolute',
+                    // position: 'absolute',
                     width: `${frameWidth}px`,
                     height: 'auto',
-                    willChange: 'transform',
                   }}
                 >
                   <div className="char-list">
-                    {levels[index].char.map((name) => {
+                    {level.char.map((name) => {
                       const img = charcImg[name];
-                      return <img key={name} src={img} alt="name" />;
+                      return <img key={name} src={img} alt={name} />;
                     })}
                   </div>
                   <img
-                    src={levels[index].img}
+                    src={level.img}
                     style={{ width: `${frameWidth}px` }}
+                    className="preview-img"
                   />
-                </animated.div>
+                </div>
               );
             })}
-          </div>
+          </animated.div>
           <button
             ref={btnRef}
             id="right-nav-btn"
             className="nav-btn"
             type="button"
             onClick={nextSlide}
+            style={getNavBtnStyle(slide, 'right')}
           >
             <i></i>
           </button>
@@ -133,15 +137,15 @@ export { levels };
 function useSlide() {
   const [slide, setSlide] = useState(0);
 
-  const [slideProps, slidePropsRef] = useSprings(levels.length, (index) => ({
-    offset: index,
+  const [slideProps, slidePropsRef] = useSpring(() => ({
+    offset: 0,
     config: {
       friction: 40,
     },
   }));
 
   useEffect(
-    () => slidePropsRef.update((index) => ({ offset: index - slide })).start(),
+    () => slidePropsRef.update(() => ({ offset: 0 - slide })).start(),
     [slide, slidePropsRef]
   );
 
@@ -180,4 +184,34 @@ function useBgFadeAnime(slide) {
   }, [slide, bgPropsRef]);
 
   return { bgProps };
+}
+
+function getNavBtnStyle(slide, direction) {
+  switch (direction) {
+    case 'left':
+      return slide === 0
+        ? {
+            opacity: 0.2,
+            cursor: 'default',
+            pointerEvents: 'none',
+          }
+        : {
+            opacity: 1,
+            cursor: 'pointer',
+            pointerEvents: 'all',
+          };
+
+    case 'right':
+      return slide === levels.length - 1
+        ? {
+            opacity: 0.2,
+            cursor: 'default',
+            pointerEvents: 'none',
+          }
+        : {
+            opacity: 1,
+            cursor: 'pointer',
+            pointerEvents: 'all',
+          };
+  }
 }
