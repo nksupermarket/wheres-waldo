@@ -7,63 +7,33 @@ import '../styles/LevelSelection.css';
 import { levels, charcImg, logo } from '../imgSrc';
 
 const LevelSelection = ({ setLevel }) => {
-  const [slide, setSlide] = useState(0);
+  const { slide, slideProps, prevSlide, nextSlide } = useSlide();
 
-  const [springProps, springPropsRef] = useSprings(levels.length, (index) => ({
-    offset: index,
-    config: {
-      friction: 40,
-    },
-  }));
-  const [bgProps, bgPropsRef] = useSprings(levels.length, () => ({
-    opacity: 0,
-    config: {
-      friction: 80,
-    },
-  }));
-  // when user clicks slider btn
-  useEffect(() => {
-    springPropsRef.update((index) => ({ offset: index - slide })).start();
-    bgPropsRef
-      .update((index) => {
-        if (index === slide) return { opacity: 1 };
-        return { opacity: 0 };
-      })
-      .start();
-  }, [slide, springPropsRef, bgPropsRef]);
+  const { bgProps } = useBgFadeAnime(slide);
 
   // get width of preview container so we know how big slide needs to be/how many px it needs to slide
-  const [width, setWidth] = useState();
-  const [btnWidth, setBtnWidth] = useState();
-
   const btnRef = useRef();
   const previewRef = useRef();
-  useEffect(() => {
-    if (width !== previewRef.current.offsetWidth) setNewWidth();
 
-    setBtnWidth(btnRef.current.offsetWidth);
+  const { frameWidth, btnWidth } = useMeasurements();
 
-    window.addEventListener('resize', setNewWidth);
-    return () => window.removeEventListener('resize', setNewWidth);
+  function useMeasurements() {
+    const [frameWidth, setFrameWidth] = useState();
+    const [btnWidth, setBtnWidth] = useState();
 
-    function setNewWidth() {
-      setWidth(previewRef.current.offsetWidth);
-    }
-  });
+    useEffect(() => {
+      setFrameWidth(previewRef.current.offsetWidth);
+      setBtnWidth(btnRef.current.offsetWidth);
 
-  /* event listeners */
-  function prevSlide() {
-    setSlide((prev) => {
-      if (prev === 0) return 0;
-      return --prev;
+      window.addEventListener('resize', setNewFrameWidth);
+      return () => window.removeEventListener('resize', setNewFrameWidth);
+
+      function setNewFrameWidth() {
+        setFrameWidth(previewRef.current.offsetWidth);
+      }
     });
-  }
 
-  function nextSlide() {
-    setSlide((prev) => {
-      if (prev === levels.length - 1) return levels.length - 1;
-      return ++prev;
-    });
+    return { frameWidth, btnWidth };
   }
 
   return (
@@ -98,7 +68,7 @@ const LevelSelection = ({ setLevel }) => {
             className="frame"
             onClick={() => setLevel(slide)}
           >
-            {springProps.map(({ offset }, index) => {
+            {slideProps.map(({ offset }, index) => {
               return (
                 <animated.div
                   key={index}
@@ -106,11 +76,11 @@ const LevelSelection = ({ setLevel }) => {
                   style={{
                     transform: offset.to((offsetX) => {
                       return `translate3d(${
-                        offsetX * (width + btnWidth)
+                        offsetX * (frameWidth + btnWidth)
                       }px, 0, 0)`;
                     }),
                     position: 'absolute',
-                    width: `${width}px`,
+                    width: `${frameWidth}px`,
                     height: 'auto',
                     willChange: 'transform',
                   }}
@@ -123,7 +93,7 @@ const LevelSelection = ({ setLevel }) => {
                   </div>
                   <img
                     src={levels[index].img}
-                    style={{ width: `${width}px` }}
+                    style={{ width: `${frameWidth}px` }}
                   />
                 </animated.div>
               );
@@ -150,3 +120,55 @@ LevelSelection.propTypes = {
 
 export default LevelSelection;
 export { levels };
+
+function useSlide() {
+  const [slide, setSlide] = useState(0);
+
+  const [slideProps, slidePropsRef] = useSprings(levels.length, (index) => ({
+    offset: index,
+    config: {
+      friction: 40,
+    },
+  }));
+
+  useEffect(
+    () => slidePropsRef.update((index) => ({ offset: index - slide })).start(),
+    [slide, slidePropsRef]
+  );
+
+  return { slide, slideProps, slidePropsRef, prevSlide, nextSlide };
+
+  function prevSlide() {
+    setSlide((prev) => {
+      if (prev === 0) return 0;
+      return --prev;
+    });
+  }
+
+  function nextSlide() {
+    setSlide((prev) => {
+      if (prev === levels.length - 1) return levels.length - 1;
+      return ++prev;
+    });
+  }
+}
+
+function useBgFadeAnime(slide) {
+  const [bgProps, bgPropsRef] = useSprings(levels.length, () => ({
+    opacity: 0,
+    config: {
+      friction: 80,
+    },
+  }));
+
+  useEffect(() => {
+    bgPropsRef
+      .update((index) => {
+        if (index === slide) return { opacity: 1 };
+        return { opacity: 0 };
+      })
+      .start();
+  }, [slide, bgPropsRef]);
+
+  return { bgProps };
+}

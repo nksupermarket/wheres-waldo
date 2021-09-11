@@ -128,6 +128,8 @@ const dragToScroll = {
 function useSelectionStatus() {
   const [selectionStatus, setPopupStatus] = useState({});
 
+  return { selectionStatus, showSelectionPopup, hideSelectionPopup };
+
   function showSelectionPopup(e) {
     setPopupStatus({
       isPopup: true,
@@ -139,11 +141,9 @@ function useSelectionStatus() {
   function hideSelectionPopup() {
     setPopupStatus((prev) => ({ ...prev, isPopup: false }));
   }
-
-  return { selectionStatus, showSelectionPopup, hideSelectionPopup };
 }
 
-function useValidStatusAndFoundChars(level) {
+function useValidStatusAndFoundChars() {
   const [validStatus, setValidStatus] = useState({});
   const [foundChars, setFoundChars] = useState([]);
 
@@ -154,12 +154,12 @@ function useValidStatusAndFoundChars(level) {
       }, 2000);
   });
 
+  return { validStatus, foundChars, validate };
+
   async function validate(level, char, clickPos, selectionBoxRadius) {
     const answers = await pullAnswers(level);
     const [answerX, answerY] = answers[char];
     const [clickX, clickY] = clickPos;
-
-    console.log({ answerX, answerY, clickPos, clickX, clickY });
 
     const selectionRange = {
       xMin: clickX - selectionBoxRadius,
@@ -198,6 +198,4 @@ function useValidStatusAndFoundChars(level) {
       });
     }
   }
-
-  return { validStatus, foundChars, validate };
 }

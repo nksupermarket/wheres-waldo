@@ -5,7 +5,6 @@ import '../styles/ValidPopup.css';
 
 const ValidPopup = ({ isValid, char }) => {
   const name = capitalizeFirstLetter(char);
-  console.log(name);
   return (
     <div id="valid-popup">
       {isValid ? (

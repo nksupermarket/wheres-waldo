@@ -61,8 +61,6 @@ import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
     answers.forEach((answer, index) =>
       setDoc(doc(db, 'answers', `${index}`), answer)
     );
-
-    console.log('success');
   })();
 })();
 
