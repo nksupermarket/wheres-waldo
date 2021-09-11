@@ -1,0 +1,12 @@
+#timer {
+  font-family: 'Roboto Mono';
+  font-size: 20px;
+}
+
+.num-timer {
+  width: 20px;
+}
+
+.ms-timer {
+  font-size: 14px;
+}

@@ -15,6 +15,11 @@ const LevelSelection = ({ setLevel }) => {
   const btnRef = useRef();
   const previewRef = useRef();
 
+  const sliderRef = useRef();
+  // useEffect(() => {
+  //   console.log(sliderRef.current.offsetHeight);
+  // });
+
   const { frameWidth, btnWidth } = useMeasurements();
 
   function useMeasurements() {
@@ -24,7 +29,10 @@ const LevelSelection = ({ setLevel }) => {
     useEffect(() => {
       setFrameWidth(previewRef.current.offsetWidth);
       setBtnWidth(btnRef.current.offsetWidth);
-
+      console.log(
+        previewRef.current.offsetWidth,
+        sliderRef.current.offsetHeight
+      );
       window.addEventListener('resize', setNewFrameWidth);
       return () => window.removeEventListener('resize', setNewFrameWidth);
 
@@ -73,6 +81,7 @@ const LevelSelection = ({ setLevel }) => {
                 <animated.div
                   key={index}
                   className="slider-slide"
+                  ref={sliderRef}
                   style={{
                     transform: offset.to((offsetX) => {
                       return `translate3d(${

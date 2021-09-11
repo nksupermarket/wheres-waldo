@@ -182,6 +182,12 @@ function useValidStatusAndFoundChars() {
     }
 
     function onValid() {
+      if (foundChars.includes(char))
+        return setValidStatus({
+          isValid: 'found',
+          showValidPopup: true,
+          selectedChar: char,
+        });
       setValidStatus({
         isValid: true,
         showValidPopup: true,

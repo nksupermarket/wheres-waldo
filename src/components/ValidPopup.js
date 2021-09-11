@@ -5,6 +5,12 @@ import '../styles/ValidPopup.css';
 
 const ValidPopup = ({ isValid, char }) => {
   const name = capitalizeFirstLetter(char);
+  if (isValid === 'found')
+    return (
+      <div id="valid-popup">
+        <p className="valid-msg">You&apos;ve already found {name}!</p>
+      </div>
+    );
   return (
     <div id="valid-popup">
       {isValid ? (
@@ -22,7 +28,7 @@ const ValidPopup = ({ isValid, char }) => {
 };
 
 ValidPopup.propTypes = {
-  isValid: PropTypes.bool,
+  isValid: PropTypes.oneOfType([PropTypes.bool, PropTypes.oneOf(['found'])]),
   char: PropTypes.string,
 };
 
