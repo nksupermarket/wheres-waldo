@@ -2,6 +2,7 @@ body {
   margin: 0;
   overflow: hidden;
   color: rgba(0, 0, 0, 0.8);
+  font-family: 'Urbanist';
 }
 button {
   background: none;
@@ -32,7 +33,22 @@ button {
   right: 0;
   background: rgba(0, 0, 0, 0.2);
 }
+#popup-modal {
+  display: grid;
+  place-items: center;
+}
 
 .char-list {
   display: flex;
+}
+
+.text-btn {
+  padding: 0.5em 1em;
+  background: tomato;
+  border-radius: 10px;
+  color: white;
+}
+
+.input-field label {
+  margin-right: 20px;
 }

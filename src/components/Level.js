@@ -11,19 +11,27 @@ import ValidPopup from './ValidPopup';
 import { pullAnswers } from '../firebaseStuff.js';
 
 import '../styles/Level.css';
+import EndgamePopup from './EndgamePopup';
 
 const Level = ({ level, goBack }) => {
+  const { validStatus, foundChars, validate } = useValidStatusAndFoundChars();
+  const { isValid, showValidPopup, selectedChar } = validStatus;
+
   const { selectionStatus, showSelectionPopup, hideSelectionPopup } =
     useSelectionStatus();
   const { isPopup, popupPos, clickPos } = selectionStatus;
 
-  const { validStatus, foundChars, validate } = useValidStatusAndFoundChars();
-  const { isValid, showValidPopup, selectedChar } = validStatus;
+  const [timer, setTimer] = useState();
+
+  const { isGameOver, setIsGameOver, time } = useIsGameOver(timer);
 
   const ctnRef = useRef();
   useEffect(() => {
     ctnRef.current.addEventListener('dblclick', showSelectionPopup);
-  });
+
+    if (isGameOver)
+      ctnRef.current.removeEventListener('dblclick', showSelectionPopup);
+  }, [isGameOver]);
   useEffect(() => {
     ctnRef.current.addEventListener('mousedown', (e) =>
       dragToScroll.mouseDownHandler(e, ctnRef)
@@ -45,10 +53,14 @@ const Level = ({ level, goBack }) => {
 
   return (
     <React.Fragment>
+      {time && <EndgamePopup level={level} time={time} goBack={goBack} />}
       <Nav
         goBack={goBack}
         charList={levels[level].char}
         foundChars={foundChars}
+        isGameOver={isGameOver}
+        setIsGameOver={setIsGameOver}
+        setTimer={setTimer}
       />
       <div id="game-ctn" ref={ctnRef}>
         <img src={levels[level].img} />
@@ -125,6 +137,10 @@ const dragToScroll = {
   },
 };
 
+/// /////////////
+// Custom Hooks//
+/// /////////////
+
 function useSelectionStatus() {
   const [selectionStatus, setPopupStatus] = useState({});
 
@@ -146,13 +162,12 @@ function useSelectionStatus() {
 function useValidStatusAndFoundChars() {
   const [validStatus, setValidStatus] = useState({});
   const [foundChars, setFoundChars] = useState([]);
-
   useEffect(() => {
     if (validStatus.showValidPopup)
       setTimeout(() => {
         setValidStatus((prev) => ({ ...prev, showValidPopup: false }));
       }, 2000);
-  });
+  }, [validStatus]);
 
   return { validStatus, foundChars, validate };
 
@@ -172,36 +187,51 @@ function useValidStatusAndFoundChars() {
       isInBetween(selectionRange.xMin, selectionRange.xMax, answerX) &&
       isInBetween(selectionRange.yMin, selectionRange.yMax, answerY)
     )
-      return onValid();
+      return onValidCheck(true);
 
-    return onInvalid();
+    return onValidCheck(false);
 
     // helper functions
     function isInBetween(min, max, num) {
       return num >= min && num <= max;
     }
 
-    function onValid() {
-      if (foundChars.includes(char))
-        return setValidStatus({
-          isValid: 'found',
-          showValidPopup: true,
-          selectedChar: char,
-        });
+    function onValidCheck(isValid) {
+      if (foundChars.includes(char)) return onAlreadyFoundChar();
       setValidStatus({
-        isValid: true,
+        isValid: isValid,
         showValidPopup: true,
         selectedChar: char,
       });
       setFoundChars((prev) => [...prev, char]);
     }
 
-    function onInvalid() {
-      setValidStatus({
-        isValid: false,
+    function onAlreadyFoundChar() {
+      return setValidStatus({
+        isValid: 'found',
         showValidPopup: true,
         selectedChar: char,
       });
     }
   }
+}
+
+function useIsGameOver(timer) {
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [time, setTime] = useState();
+
+  useEffect(() => {
+    if (isGameOver) setTime({ timer: timer, ms: convertToMillsec(timer) });
+  }, [isGameOver]);
+
+  return { isGameOver, setIsGameOver, time };
+}
+
+/// /////////////
+// helper funcs//
+/// /////////////
+
+function convertToMillsec(timer) {
+  const split = timer.split(':');
+  return +split[0] * 60000 + +split[1] * 1000 + +split[2];
 }

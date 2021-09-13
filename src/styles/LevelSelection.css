@@ -21,7 +21,8 @@
   height: 100%;
 }
 #level-selection-ctn {
-  width: 50%;
+  width: 30%;
+  min-width: 480px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,22 +42,12 @@
   flex-shrink: 0;
   position: relative;
 }
-.btn-ctn {
-  width: 99%;
-  z-index: 1;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: space-between;
-}
 .nav-btn {
   z-index: 1;
   height: 100%;
   background: white;
   position: absolute;
-  padding: 1em;
+  padding: 3em 1em;
 }
 #right-nav-btn {
   right: 0;

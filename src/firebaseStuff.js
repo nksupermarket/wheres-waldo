@@ -11,6 +11,7 @@ import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 
   (async function uploadAnswers() {
     const db = getFirestore();
+
     const answer = await getDoc(doc(db, 'answers', '0'));
     if (answer.exists()) return;
 
@@ -71,4 +72,29 @@ async function pullAnswers(level) {
   if (answers.exists()) return answers.data();
 }
 
-export { pullAnswers };
+async function pullLeaderboard(level) {
+  const db = getFirestore();
+
+  const leaderboard = await getDoc(doc(db, 'leaderboard', 'allLevels'));
+  if (leaderboard.exists()) return leaderboard.data()[level];
+  return null;
+}
+
+async function updateLeaderboard(level, leaderboard) {
+  const db = getFirestore();
+  const allLeaderboard = await getDoc(doc(db, 'leaderboard', 'allLevels'));
+  if (allLeaderboard.exists())
+    return db
+      .collection('leaderboard')
+      .doc('allLevels')
+      .update({
+        [level]: leaderboard,
+      })
+      .then(() => 'doc updated');
+  console.log({ [level]: leaderboard });
+  return setDoc(doc(db, 'answers', 'allLevels'), { [level]: leaderboard }).then(
+    () => console.log('doc set')
+  );
+}
+
+export { pullAnswers, pullLeaderboard, updateLeaderboard };

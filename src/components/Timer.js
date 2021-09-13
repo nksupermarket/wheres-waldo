@@ -1,21 +1,39 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 import '../styles/Timer.css';
 
-const Timer = () => {
+const Timer = React.forwardRef(({ isGameOver }, ref) => {
   const [timer, setTimer] = useState('00:00:00');
   const [startTime] = useState(Date.now());
 
-  useEffect(() => {
-    setInterval(() => {
-      const elapsedTime = Date.now() - startTime;
-      setTimer(elapsedTime);
-    }, 50);
+  let isMounted = true;
+  useEffect(() => () => {
+    isMounted = false;
   });
-  return <div id="timer">{millisecondsToTime(timer)}</div>;
-};
 
+  useEffect(() => {
+    isGameOver ? clearInterval(myTimer) : setInterval(myTimer, 50);
+
+    function myTimer() {
+      const elapsedTime = Date.now() - startTime;
+      if (!isMounted) return;
+      setTimer(elapsedTime);
+    }
+  });
+  return (
+    <div id="timer" ref={ref}>
+      {millisecondsToTime(timer)}
+    </div>
+  );
+});
+
+Timer.displayName = Timer;
 export default Timer;
+
+Timer.propTypes = {
+  isGameOver: PropTypes.bool,
+};
 
 function millisecondsToTime(milli) {
   const milliseconds = milli % 1000;
@@ -25,7 +43,7 @@ function millisecondsToTime(milli) {
     <div>
       <span className="num-timer">{pad(minutes) + ':'}</span>
       <span className="num-timer">{pad(seconds) + ':'}</span>
-      <span className="num-timer ms-timer">{pad(milliseconds)}</span>
+      <span className="num-timer ms-timer">{pad(milliseconds, 3)}</span>
     </div>
   );
 

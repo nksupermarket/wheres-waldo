@@ -21,7 +21,7 @@ const LevelSelection = ({ setLevel }) => {
   // });
 
   const { frameWidth, btnWidth } = useMeasurements();
-  console.log(btnWidth);
+
   function useMeasurements() {
     const [frameWidth, setFrameWidth] = useState();
     const [btnWidth, setBtnWidth] = useState();
@@ -84,14 +84,12 @@ const LevelSelection = ({ setLevel }) => {
             }}
           >
             {levels.map((level, index) => {
-              console.log(slideProps);
               return (
                 <div
                   key={index}
                   className="slider-slide"
                   ref={sliderRef}
                   style={{
-                    // position: 'absolute',
                     width: `${frameWidth}px`,
                     height: 'auto',
                   }}
@@ -133,6 +131,10 @@ LevelSelection.propTypes = {
 
 export default LevelSelection;
 export { levels };
+
+/// /////////////
+// Custom Hooks//
+/// /////////////
 
 function useSlide() {
   const [slide, setSlide] = useState(0);
@@ -185,6 +187,10 @@ function useBgFadeAnime(slide) {
 
   return { bgProps };
 }
+
+/// /////////////
+// helper funcs//
+/// /////////////
 
 function getNavBtnStyle(slide, direction) {
   switch (direction) {
