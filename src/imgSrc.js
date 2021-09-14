@@ -4,7 +4,7 @@ import woof from './assets/characters/dog.png';
 import wizard from './assets/characters/wizard.png';
 import odlaw from './assets/characters/evil_waldo.png';
 
-import levelOne from './assets/levels/opt_1*7v_75ZGg1CTmWAw1rEgMHQ.jpeg';
+import levelOne from './assets/levels/opt_wheres-waldo-0.jpeg';
 import levelTwo from './assets/levels/opt_wheres-waldo-1.jpeg';
 import levelThree from './assets/levels/opt_wheres-waldo-2.jpeg';
 import levelFour from './assets/levels/opt_wheres-waldo-3.jpeg';
