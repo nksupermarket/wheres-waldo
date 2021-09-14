@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useSpring, useSprings, animated } from 'react-spring';
 
-import '../styles/LevelSelection.css';
+import { pullLeaderboard } from '../logic/firebaseStuff';
+import { millisecondsToTime, parseTime } from '../logic/time';
 
+import '../styles/LevelSelection.css';
 import { levels, charcImg, logo } from '../imgSrc';
 
 const LevelSelection = ({ setLevel }) => {
@@ -15,13 +17,15 @@ const LevelSelection = ({ setLevel }) => {
   const btnRef = useRef();
   const previewRef = useRef();
 
-  const sliderRef = useRef();
-  // useEffect(() => {
-  //   console.log(sliderRef.current.offsetHeight);
-  // });
-
   const { frameWidth, btnWidth } = useMeasurements();
 
+  const [leaderboard, setLeaderboard] = useState();
+  useEffect(async function () {
+    const leaderboard = await pullLeaderboard();
+    setLeaderboard(leaderboard);
+  }, []);
+
+  // custom hook
   function useMeasurements() {
     const [frameWidth, setFrameWidth] = useState();
     const [btnWidth, setBtnWidth] = useState();
@@ -84,16 +88,22 @@ const LevelSelection = ({ setLevel }) => {
             }}
           >
             {levels.map((level, index) => {
+              const bestTime =
+                leaderboard && leaderboard[index]
+                  ? parseTime(
+                      millisecondsToTime(leaderboard[index][0].time, false)
+                    )
+                  : '--:--:---';
               return (
                 <div
                   key={index}
                   className="slider-slide"
-                  ref={sliderRef}
                   style={{
                     width: `${frameWidth}px`,
                     height: 'auto',
                   }}
                 >
+                  <p className="best-time">Best time: {bestTime}</p>
                   <div className="char-list">
                     {level.char.map((name) => {
                       const img = charcImg[name];

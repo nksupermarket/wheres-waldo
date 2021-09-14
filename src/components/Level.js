@@ -6,24 +6,32 @@ import Nav from './Nav';
 import { levels } from './LevelSelection';
 import CharPopup from './CharPopup';
 import SelectionBox from './SelectionBox';
-import ValidPopup from './ValidPopup';
+import InfoPopup from './InfoPopup';
+import EndgamePopup from './EndgamePopup';
+import NewGamePopup from './NewGamePopup';
 
-import { pullAnswers } from '../firebaseStuff.js';
+import { pullAnswers } from '../logic/firebaseStuff.js';
 
 import '../styles/Level.css';
-import EndgamePopup from './EndgamePopup';
 
 const Level = ({ level, goBack }) => {
-  const { validStatus, foundChars, validate } = useValidStatusAndFoundChars();
-  const { isValid, showValidPopup, selectedChar } = validStatus;
+  const [infoPopupStatus, setInfoPopupStatus] = useInfoPopupStatus();
+
+  const { foundChars, setFoundChars, validate } = useFoundChars();
 
   const { selectionStatus, showSelectionPopup, hideSelectionPopup } =
     useSelectionStatus();
   const { isPopup, popupPos, clickPos } = selectionStatus;
 
-  const [timer, setTimer] = useState();
+  const [timer, setTimer] = useState(0);
 
-  const { isGameOver, setIsGameOver, time } = useIsGameOver(timer);
+  const [isEndgamePopup, setIsEndgamePopup] = useState(false);
+  const { isGameOver, setIsGameOver, endTime } = useIsGameOver(
+    timer,
+    setIsEndgamePopup
+  );
+
+  const [isNewGamePopup, setIsNewGamePopup] = useState(false);
 
   const ctnRef = useRef();
   useEffect(() => {
@@ -51,21 +59,42 @@ const Level = ({ level, goBack }) => {
 
   const selectionBoxRadius = 55;
 
+  function reset() {
+    setIsNewGamePopup(false);
+    setFoundChars([]);
+    setTimer(0);
+    setIsGameOver(false);
+  }
+
   return (
     <React.Fragment>
-      {time && <EndgamePopup level={level} time={time} goBack={goBack} />}
+      {isEndgamePopup && (
+        <EndgamePopup
+          level={level}
+          time={endTime}
+          close={() => {
+            setIsEndgamePopup(false);
+          }}
+          setInfoPopupStatus={setInfoPopupStatus}
+          showNewGamePopup={() => setIsNewGamePopup(true)}
+        />
+      )}
+      {isNewGamePopup && <NewGamePopup goBack={goBack} reset={reset} />}
       <Nav
         goBack={goBack}
         charList={levels[level].char}
         foundChars={foundChars}
         isGameOver={isGameOver}
         setIsGameOver={setIsGameOver}
+        timer={timer}
         setTimer={setTimer}
       />
       <div id="game-ctn" ref={ctnRef}>
         <img src={levels[level].img} />
       </div>
-      {showValidPopup && <ValidPopup isValid={isValid} char={selectedChar} />}
+      {infoPopupStatus.isShow && (
+        <InfoPopup msg={infoPopupStatus.msg} icon={infoPopupStatus.icon} />
+      )}
       {isPopup && (
         <animated.div
           className="modal"
@@ -83,7 +112,13 @@ const Level = ({ level, goBack }) => {
             <CharPopup
               chars={levels[level].char}
               validate={(char) => {
-                validate(level, char, clickPos, selectionBoxRadius);
+                validate(
+                  level,
+                  char,
+                  clickPos,
+                  selectionBoxRadius,
+                  setInfoPopupStatus
+                );
                 hideSelectionPopup();
               }}
             />
@@ -159,19 +194,39 @@ function useSelectionStatus() {
   }
 }
 
-function useValidStatusAndFoundChars() {
-  const [validStatus, setValidStatus] = useState({});
-  const [foundChars, setFoundChars] = useState([]);
+function useInfoPopupStatus() {
+  const [infoPopupStatus, setInfoPopupStatus] = useState({});
+
   useEffect(() => {
-    if (validStatus.showValidPopup)
-      setTimeout(() => {
-        setValidStatus((prev) => ({ ...prev, showValidPopup: false }));
+    if (infoPopupStatus.isShow) {
+      let timer = null;
+
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+
+      timer = setTimeout(() => {
+        setInfoPopupStatus((prev) => ({ ...prev, isShow: false }));
       }, 2000);
-  }, [validStatus]);
+    }
+  }, [infoPopupStatus]);
 
-  return { validStatus, foundChars, validate };
+  return [infoPopupStatus, setInfoPopupStatus];
+}
 
-  async function validate(level, char, clickPos, selectionBoxRadius) {
+function useFoundChars() {
+  const [foundChars, setFoundChars] = useState([]);
+
+  return { foundChars, setFoundChars, validate };
+
+  async function validate(
+    level,
+    char,
+    clickPos,
+    selectionBoxRadius,
+    setInfoPopupStatus
+  ) {
     const answers = await pullAnswers(level);
     const [answerX, answerY] = answers[char];
     const [clickX, clickY] = clickPos;
@@ -197,41 +252,53 @@ function useValidStatusAndFoundChars() {
     }
 
     function onValidCheck(isValid) {
-      if (foundChars.includes(char)) return onAlreadyFoundChar();
-      setValidStatus({
-        isValid: isValid,
-        showValidPopup: true,
-        selectedChar: char,
+      if (foundChars.includes(char)) isValid = 'found';
+      const name = capitalizeFirstLetter(char);
+      let msg;
+      let icon;
+      switch (isValid) {
+        case true:
+          msg = `You found ${name}!`;
+          icon = 'flaticon-draw-check-mark';
+          break;
+        case false:
+          msg = `Woops! ${name} isn't there. Try
+        again.`;
+          icon = 'flaticon-close';
+          break;
+        case 'found':
+          msg = `You've already found ${name}!`;
+          icon = '';
+          break;
+      }
+      setInfoPopupStatus({
+        isShow: true,
+        msg,
+        icon,
       });
-      setFoundChars((prev) => [...prev, char]);
-    }
-
-    function onAlreadyFoundChar() {
-      return setValidStatus({
-        isValid: 'found',
-        showValidPopup: true,
-        selectedChar: char,
-      });
+      if (!foundChars.includes(char)) setFoundChars((prev) => [...prev, char]);
     }
   }
 }
 
-function useIsGameOver(timer) {
+function useIsGameOver(timer, setIsEndgamePopup) {
   const [isGameOver, setIsGameOver] = useState(false);
-  const [time, setTime] = useState();
+  const [endTime, setEndTime] = useState();
 
   useEffect(() => {
-    if (isGameOver) setTime({ timer: timer, ms: convertToMillsec(timer) });
+    if (isGameOver) {
+      setEndTime(timer);
+      setIsEndgamePopup(true);
+    }
   }, [isGameOver]);
 
-  return { isGameOver, setIsGameOver, time };
+  return { isGameOver, setIsGameOver, endTime };
 }
 
 /// /////////////
 // helper funcs//
 /// /////////////
 
-function convertToMillsec(timer) {
-  const split = timer.split(':');
-  return +split[0] * 60000 + +split[1] * 1000 + +split[2];
+function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

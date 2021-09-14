@@ -1,17 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import { pullLeaderboard, updateLeaderboard } from '../firebaseStuff';
+import { pullLeaderboard, updateLeaderboard } from '../logic/firebaseStuff';
+import { millisecondsToTime, parseTime } from '../logic/time';
 
 import '../styles/EndgamePopup.css';
 
-const EndgamePopup = ({ level, time, goBack }) => {
+const EndgamePopup = ({
+  level,
+  time,
+  close,
+  setInfoPopupStatus,
+  showNewGamePopup,
+}) => {
   const [place, setPlace] = useState();
+  const [isError, setIsError] = useState(false);
   const inputRef = useRef();
 
-  console.log(level);
+  console.log(pullLeaderboard);
   useEffect(async function () {
-    setPlace(await getPlace(level, time.ms));
+    if (!isError)
+      setPlace(await getPlace(level, time, setInfoPopupStatus, setIsError));
   });
   return (
     <div id="popup-modal" className="modal">
@@ -21,7 +30,7 @@ const EndgamePopup = ({ level, time, goBack }) => {
         </header>
         <hr />
         <main>
-          <h3>You finished in {parseTime(time.timer)}</h3>
+          <h3>You finished in {parseTime(millisecondsToTime(time, false))}</h3>
           <p>Enter your name to save your score on the global leaderboard.</p>
           <div className="input-field">
             <label htmlFor="name">Username</label>
@@ -33,7 +42,10 @@ const EndgamePopup = ({ level, time, goBack }) => {
             type="button"
             id="cancel-btn"
             className="text-btn"
-            onClick={goBack}
+            onClick={() => {
+              close();
+              showNewGamePopup();
+            }}
           >
             Cancel
           </button>
@@ -41,7 +53,17 @@ const EndgamePopup = ({ level, time, goBack }) => {
             type="button"
             id="submit-btn"
             className="text-btn"
-            onClick={() => onSubmit(level, time.ms, inputRef.current, goBack)}
+            onClick={() =>
+              onSubmit(
+                level,
+                time,
+                inputRef.current,
+                close,
+                setInfoPopupStatus,
+                setIsError,
+                showNewGamePopup
+              )
+            }
           >
             Submit
           </button>
@@ -53,30 +75,58 @@ const EndgamePopup = ({ level, time, goBack }) => {
 
 EndgamePopup.propTypes = {
   level: PropTypes.number,
-  time: PropTypes.object,
-  goBack: PropTypes.func,
+  time: PropTypes.number,
+  close: PropTypes.func,
+  setInfoPopupStatus: PropTypes.func,
+  showNewGamePopup: PropTypes.func,
 };
 
 export default EndgamePopup;
 
-async function getPlace(level, time) {
-  const leaderboard = await sortNewLeaderboard(level, time);
-  return leaderboard.findIndex((obj) => obj.time === time) || 1;
+async function getPlace(level, time, setInfoPopupStatus, setIsError) {
+  try {
+    const leaderboard = await sortNewLeaderboard(level, time);
+    return leaderboard.findIndex((obj) => obj.time === time) + 1;
+  } catch (error) {
+    setIsError(true);
+    setInfoPopupStatus({
+      isShow: true,
+      msg: error.message,
+      icon: 'flaticon-close',
+    });
+    return '#';
+  }
 }
 
-function parseTime(time) {
-  const split = time.split(':');
-  if (split[0] === '00') return time.slice(3) + ' seconds';
-  return time + ' minutes';
-}
-
-async function onSubmit(level, time, inputRef, goBack) {
+async function onSubmit(
+  level,
+  time,
+  inputRef,
+  close,
+  setInfoPopupStatus,
+  setIsError,
+  showNewGamePopup
+) {
   const username = inputRef.value;
-
-  const leaderboard = await sortNewLeaderboard(level, time, username);
-  console.log(leaderboard);
-  updateLeaderboard(level, leaderboard);
-  goBack();
+  try {
+    const leaderboard = await sortNewLeaderboard(level, time, username);
+    await updateLeaderboard(level, leaderboard);
+    setIsError(false);
+    setInfoPopupStatus({
+      isShow: true,
+      msg: 'Time uploaded successfully',
+      icon: 'flaticon-draw-check-mark',
+    });
+    close();
+    showNewGamePopup();
+  } catch (error) {
+    setInfoPopupStatus({
+      isShow: true,
+      msg: error.message,
+      icon: 'flaticon-close',
+    });
+    throw new Error(error);
+  }
 }
 
 async function sortNewLeaderboard(level, time, username) {

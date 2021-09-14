@@ -1,5 +1,11 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+} from 'firebase/firestore';
 
 (function init() {
   const config = {
@@ -42,11 +48,11 @@ import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
         waldo: [842, 655],
         wenda: [757, 1381],
         wizard: [1837, 1652],
-        odwald: [1799, 1230],
+        odlaw: [1799, 1230],
       },
       {
         wenda: [1799, 1303],
-        odwald: [1671, 1549],
+        odlaw: [1671, 1549],
         waldo: [2111, 832],
         wizard: [2072, 1305],
         woof: [1558, 1261],
@@ -68,33 +74,47 @@ import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 async function pullAnswers(level) {
   const db = getFirestore();
 
-  const answers = await getDoc(doc(db, 'answers', `${level}`));
-  if (answers.exists()) return answers.data();
+  try {
+    const answers = await getDoc(doc(db, 'answers', `${level}`));
+    if (answers.exists()) return answers.data();
+  } catch (error) {
+    throw new Error(error);
+  }
 }
 
 async function pullLeaderboard(level) {
   const db = getFirestore();
 
-  const leaderboard = await getDoc(doc(db, 'leaderboard', 'allLevels'));
-  if (leaderboard.exists()) return leaderboard.data()[level];
-  return null;
+  try {
+    const leaderboard = await getDoc(doc(db, 'leaderboard', 'allLevels'));
+    if (!leaderboard.exists()) return;
+
+    if (level !== 0 && !level) return leaderboard.data();
+
+    return leaderboard.data()[level];
+  } catch (error) {
+    throw new Error(error);
+  }
 }
 
 async function updateLeaderboard(level, leaderboard) {
   const db = getFirestore();
-  const allLeaderboard = await getDoc(doc(db, 'leaderboard', 'allLevels'));
-  if (allLeaderboard.exists())
-    return db
-      .collection('leaderboard')
-      .doc('allLevels')
-      .update({
+
+  try {
+    const leaderboardRef = doc(db, 'leaderboard', 'allLevels');
+    const allLeaderboard = await getDoc(leaderboardRef);
+
+    if (allLeaderboard.exists())
+      return updateDoc(leaderboardRef, {
         [level]: leaderboard,
-      })
-      .then(() => 'doc updated');
-  console.log({ [level]: leaderboard });
-  return setDoc(doc(db, 'answers', 'allLevels'), { [level]: leaderboard }).then(
-    () => console.log('doc set')
-  );
+      });
+
+    return setDoc(doc(db, 'leaderboard', 'allLevels'), {
+      [level]: leaderboard,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
 }
 
 export { pullAnswers, pullLeaderboard, updateLeaderboard };
