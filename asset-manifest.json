@@ -1,18 +1,19 @@
 {
   "files": {
-    "main.css": "/wheres-waldo/static/css/main.c1febfc7.chunk.css",
-    "main.js": "/wheres-waldo/static/js/main.bcfc95a3.chunk.js",
-    "main.js.map": "/wheres-waldo/static/js/main.bcfc95a3.chunk.js.map",
+    "main.css": "/wheres-waldo/static/css/main.4f7922e8.chunk.css",
+    "main.js": "/wheres-waldo/static/js/main.5bbef688.chunk.js",
+    "main.js.map": "/wheres-waldo/static/js/main.5bbef688.chunk.js.map",
     "runtime-main.js": "/wheres-waldo/static/js/runtime-main.79a09a4b.js",
     "runtime-main.js.map": "/wheres-waldo/static/js/runtime-main.79a09a4b.js.map",
-    "static/js/2.723c4449.chunk.js": "/wheres-waldo/static/js/2.723c4449.chunk.js",
-    "static/js/2.723c4449.chunk.js.map": "/wheres-waldo/static/js/2.723c4449.chunk.js.map",
+    "static/js/2.91b83a5d.chunk.js": "/wheres-waldo/static/js/2.91b83a5d.chunk.js",
+    "static/js/2.91b83a5d.chunk.js.map": "/wheres-waldo/static/js/2.91b83a5d.chunk.js.map",
     "index.html": "/wheres-waldo/index.html",
-    "static/css/main.c1febfc7.chunk.css.map": "/wheres-waldo/static/css/main.c1febfc7.chunk.css.map",
-    "static/js/2.723c4449.chunk.js.LICENSE.txt": "/wheres-waldo/static/js/2.723c4449.chunk.js.LICENSE.txt",
+    "static/css/main.4f7922e8.chunk.css.map": "/wheres-waldo/static/css/main.4f7922e8.chunk.css.map",
+    "static/js/2.91b83a5d.chunk.js.LICENSE.txt": "/wheres-waldo/static/js/2.91b83a5d.chunk.js.LICENSE.txt",
     "static/media/Wheres_Waldo_-_Logo.e6ffa93d.png": "/wheres-waldo/static/media/Wheres_Waldo_-_Logo.e6ffa93d.png",
     "static/media/dog.556b0530.png": "/wheres-waldo/static/media/dog.556b0530.png",
     "static/media/evil_waldo.792cf427.png": "/wheres-waldo/static/media/evil_waldo.792cf427.png",
+    "static/media/flaticon.css": "/wheres-waldo/static/media/flaticon.82eb14c4.ttf",
     "static/media/gf.0cb89a79.png": "/wheres-waldo/static/media/gf.0cb89a79.png",
     "static/media/opt_wheres-waldo-0.220971a1.jpeg": "/wheres-waldo/static/media/opt_wheres-waldo-0.220971a1.jpeg",
     "static/media/opt_wheres-waldo-1.a7ef3e57.jpeg": "/wheres-waldo/static/media/opt_wheres-waldo-1.a7ef3e57.jpeg",
@@ -26,8 +27,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.79a09a4b.js",
-    "static/js/2.723c4449.chunk.js",
-    "static/css/main.c1febfc7.chunk.css",
-    "static/js/main.bcfc95a3.chunk.js"
+    "static/js/2.91b83a5d.chunk.js",
+    "static/css/main.4f7922e8.chunk.css",
+    "static/js/main.5bbef688.chunk.js"
   ]
 }
