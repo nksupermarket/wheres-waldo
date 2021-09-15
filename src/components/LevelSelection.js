@@ -1,17 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useSpring, useSprings, animated } from 'react-spring';
+import { useSpring, animated } from 'react-spring';
 
 import { pullLeaderboard } from '../logic/firebaseStuff';
 import { millisecondsToTime, parseTime } from '../logic/time';
 
+import NavBtn from './NavBtn';
+import LevelSelectBG from './LevelSelectBG';
+import LevelSelectSlide from './LevelSelectSlide';
+
 import '../styles/LevelSelection.css';
-import { levels, charcImg, logo } from '../imgSrc';
+import { levels, logo } from '../imgSrc';
 
 const LevelSelection = ({ setLevel }) => {
   const { slide, slideProps, prevSlide, nextSlide } = useSlide();
-
-  const { bgProps } = useBgFadeAnime(slide);
 
   // get width of preview container so we know how big slide needs to be/how many px it needs to slide
   const btnRef = useRef();
@@ -49,32 +51,16 @@ const LevelSelection = ({ setLevel }) => {
 
   return (
     <React.Fragment>
-      <div id="bg-frame" className="frame">
-        {bgProps.map((style, index) => {
-          const bgImage = { backgroundImage: `url(${levels[index].img})` };
-          return (
-            <animated.div
-              key={index}
-              className="slider-slide"
-              style={{ ...style, ...bgImage }}
-            ></animated.div>
-          );
-        })}
-      </div>
+      <LevelSelectBG slide={slide} />
       <div id="level-selection-ctn">
         <img src={logo} alt="wheres waldo" height="80px" />
         <p>Select a level</p>
         <div className="slider">
-          <button
-            id="left-nav-btn"
-            className="nav-btn"
-            type="button"
+          <NavBtn
+            direction="left"
             onClick={prevSlide}
             style={getNavBtnStyle(slide, 'left')}
-          >
-            <i></i>
-          </button>
-
+          />
           <animated.div
             ref={previewRef}
             className="frame"
@@ -95,40 +81,23 @@ const LevelSelection = ({ setLevel }) => {
                     )
                   : '--:--:---';
               return (
-                <div
+                <LevelSelectSlide
                   key={index}
-                  className="slider-slide"
-                  style={{
-                    width: `${frameWidth}px`,
-                    height: 'auto',
-                  }}
-                >
-                  <p className="best-time">Best time: {bestTime}</p>
-                  <div className="char-list">
-                    {level.char.map((name) => {
-                      const img = charcImg[name];
-                      return <img key={name} src={img} alt={name} />;
-                    })}
-                  </div>
-                  <img
-                    src={level.img}
-                    style={{ width: `${frameWidth}px` }}
-                    className="preview-img"
-                  />
-                </div>
+                  frameWidth={frameWidth}
+                  bestTime={bestTime}
+                  charList={level.char}
+                  img={level.img}
+                  isVisible={slide === index}
+                />
               );
             })}
           </animated.div>
-          <button
+          <NavBtn
             ref={btnRef}
-            id="right-nav-btn"
-            className="nav-btn"
-            type="button"
+            direction="right"
             onClick={nextSlide}
             style={getNavBtnStyle(slide, 'right')}
-          >
-            <i></i>
-          </button>
+          />
         </div>
       </div>
     </React.Fragment>
@@ -176,26 +145,6 @@ function useSlide() {
       return ++prev;
     });
   }
-}
-
-function useBgFadeAnime(slide) {
-  const [bgProps, bgPropsRef] = useSprings(levels.length, () => ({
-    opacity: 0,
-    config: {
-      friction: 80,
-    },
-  }));
-
-  useEffect(() => {
-    bgPropsRef
-      .update((index) => {
-        if (index === slide) return { opacity: 1 };
-        return { opacity: 0 };
-      })
-      .start();
-  }, [slide, bgPropsRef]);
-
-  return { bgProps };
 }
 
 /// /////////////

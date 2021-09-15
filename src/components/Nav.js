@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 
 import Timer from './Timer';
 import Tooltip from './Tooltip';
-
-import { charcImg } from '../imgSrc';
+import CharList from './CharList';
 
 import '../styles/Nav.css';
 
@@ -43,19 +42,7 @@ const Nav = ({
         </div>
       </div>
       <Timer timer={timer} setTimer={setTimer} isGameOver={isGameOver} />
-      <div className="char-list">
-        {charList.map((char) => {
-          if (foundChars.includes(char))
-            return (
-              <div key={char} className="char-ctn">
-                <i className="flaticon-draw-check-mark"></i>
-                <img src={charcImg[char]} alt={char} />
-              </div>
-            );
-
-          return <img key={char} src={charcImg[char]} alt={char} />;
-        })}
-      </div>
+      <CharList list={charList} foundChars={foundChars} />
     </nav>
   );
 };

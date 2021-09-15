@@ -7,6 +7,10 @@
   display: block;
   background: gray;
 }
+#bg-frame .slider-slide.lazy {
+  background-image: none !important;
+  background-color: white;
+}
 #bg-frame .slider-slide {
   display: block;
   width: 100%;
