@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import LevelSelection from './components/LevelSelection';
+import LevelSelection from './components/LevelSelect/LevelSelection';
 import Level from './components/Level';
 
 import './globalStyles.css';

@@ -1,53 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useSpring, animated } from 'react-spring';
+import { useSpring } from 'react-spring';
 
-import { pullLeaderboard } from '../logic/firebaseStuff';
-import { millisecondsToTime, parseTime } from '../logic/time';
-
-import NavBtn from './NavBtn';
+import NavBtn from '../NavBtn';
 import LevelSelectBG from './LevelSelectBG';
-import LevelSelectSlide from './LevelSelectSlide';
 
-import '../styles/LevelSelection.css';
-import { levels, logo } from '../imgSrc';
+import '../../styles/LevelSelection.css';
+import { levels, logo } from '../../imgSrc';
+import LevelSelectSliderFrame from './LevelSelectSliderFrame';
 
 const LevelSelection = ({ setLevel }) => {
   const { slide, slideProps, prevSlide, nextSlide } = useSlide();
 
-  // get width of preview container so we know how big slide needs to be/how many px it needs to slide
   const btnRef = useRef();
-  const previewRef = useRef();
-
-  const { frameWidth, btnWidth } = useMeasurements();
-
-  const [leaderboard, setLeaderboard] = useState();
-  useEffect(async function () {
-    const leaderboard = await pullLeaderboard();
-    setLeaderboard(leaderboard);
-  }, []);
-
-  // custom hook
-  function useMeasurements() {
-    const [frameWidth, setFrameWidth] = useState();
-    const [btnWidth, setBtnWidth] = useState();
-
-    useEffect(() => {
-      setFrameWidth(
-        previewRef.current.offsetWidth - 2 * btnRef.current.offsetWidth
-      );
-      setBtnWidth(btnRef.current.offsetWidth);
-
-      window.addEventListener('resize', setNewFrameWidth);
-      return () => window.removeEventListener('resize', setNewFrameWidth);
-
-      function setNewFrameWidth() {
-        setFrameWidth(previewRef.current.offsetWidth);
-      }
-    });
-
-    return { frameWidth, btnWidth };
-  }
 
   return (
     <React.Fragment>
@@ -61,37 +26,12 @@ const LevelSelection = ({ setLevel }) => {
             onClick={prevSlide}
             style={getNavBtnStyle(slide, 'left')}
           />
-          <animated.div
-            ref={previewRef}
-            className="frame"
-            onClick={() => setLevel(slide)}
-            style={{
-              transform: slideProps.offset.to(
-                (offsetX) => `translate3d(${offsetX * frameWidth}px, 0, 0)`
-              ),
-              willChange: 'transform',
-              marginLeft: `${btnWidth}px`,
-            }}
-          >
-            {levels.map((level, index) => {
-              const bestTime =
-                leaderboard && leaderboard[index]
-                  ? parseTime(
-                      millisecondsToTime(leaderboard[index][0].time, false)
-                    )
-                  : '--:--:---';
-              return (
-                <LevelSelectSlide
-                  key={index}
-                  frameWidth={frameWidth}
-                  bestTime={bestTime}
-                  charList={level.char}
-                  img={level.img}
-                  isVisible={slide === index}
-                />
-              );
-            })}
-          </animated.div>
+          <LevelSelectSliderFrame
+            slide={slide}
+            slideProps={slideProps}
+            btnRef={btnRef}
+            setLevel={setLevel}
+          />
           <NavBtn
             ref={btnRef}
             direction="right"

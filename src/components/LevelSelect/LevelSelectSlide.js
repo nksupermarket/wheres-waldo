@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import CharList from './CharList';
+import CharList from '../CharList';
 
 const LevelSelectSlide = ({
   frameWidth,

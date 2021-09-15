@@ -4,7 +4,7 @@ import { useSprings } from 'react-spring';
 
 import LevelSelectBGSlide from './LevelSelectBGSlide';
 
-import { levels } from '../imgSrc';
+import { levels } from '../../imgSrc';
 
 const LevelSelectBG = ({ slide }) => {
   const { bgProps } = useBgFadeAnime(slide);
@@ -18,7 +18,9 @@ const LevelSelectBG = ({ slide }) => {
             key={index}
             style={style}
             bgImage={bgImage}
-            isVisible={slide === index}
+            isVisible={
+              slide - 1 === index || slide === index || slide + 1 === index
+            }
           />
         );
       })}

@@ -1,35 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSpring, animated } from 'react-spring';
 import PropTypes from 'prop-types';
 
 import Nav from './Nav';
-import { levels } from './LevelSelection';
-import CharPopup from './CharPopup';
-import SelectionBox from './SelectionBox';
+
 import InfoPopup from './InfoPopup';
 import EndgamePopup from './EndgamePopup';
 import NewGamePopup from './NewGamePopup';
+import SelectionPopup from './SelectionPopup';
 
 import { pullAnswers } from '../logic/firebaseStuff.js';
+
+import { levels } from '../imgSrc';
 
 import '../styles/Level.css';
 
 const Level = ({ level, goBack }) => {
+  const [timer, setTimer] = useState(0);
+
   const [infoPopupStatus, setInfoPopupStatus] = useInfoPopupStatus();
 
-  const { foundChars, setFoundChars, validate } = useFoundChars();
+  const [foundChars, setFoundChars] = useState([]);
 
   const { selectionStatus, showSelectionPopup, hideSelectionPopup } =
     useSelectionStatus();
   const { isPopup, popupPos, clickPos } = selectionStatus;
 
-  const [timer, setTimer] = useState(0);
-
   const [isEndgamePopup, setIsEndgamePopup] = useState(false);
-  const { isGameOver, setIsGameOver, endTime } = useIsGameOver(
-    timer,
-    setIsEndgamePopup
-  );
+  const { isGameOver, setIsGameOver } = useIsGameOver(setIsEndgamePopup);
 
   const [isNewGamePopup, setIsNewGamePopup] = useState(false);
 
@@ -55,10 +52,6 @@ const Level = ({ level, goBack }) => {
     );
   });
 
-  const modalStyle = useSpring({ opacity: isPopup ? 1 : 0 });
-
-  const selectionBoxRadius = 55;
-
   function reset() {
     setIsNewGamePopup(false);
     setFoundChars([]);
@@ -71,7 +64,7 @@ const Level = ({ level, goBack }) => {
       {isEndgamePopup && (
         <EndgamePopup
           level={level}
-          time={endTime}
+          time={timer}
           close={() => {
             setIsEndgamePopup(false);
           }}
@@ -96,34 +89,22 @@ const Level = ({ level, goBack }) => {
         <InfoPopup msg={infoPopupStatus.msg} icon={infoPopupStatus.icon} />
       )}
       {isPopup && (
-        <animated.div
-          className="modal"
-          style={modalStyle}
-          onClick={hideSelectionPopup}
-        >
-          <div
-            id="selection"
-            style={{
-              top: popupPos.y - selectionBoxRadius,
-              left: popupPos.x - selectionBoxRadius,
-            }}
-          >
-            <SelectionBox />
-            <CharPopup
-              chars={levels[level].char}
-              validate={(char) => {
-                validate(
-                  level,
-                  char,
-                  clickPos,
-                  selectionBoxRadius,
-                  setInfoPopupStatus
-                );
-                hideSelectionPopup();
-              }}
-            />
-          </div>
-        </animated.div>
+        <SelectionPopup
+          level={level}
+          validate={(char, selectionBoxRadius) => {
+            validate(
+              level,
+              char,
+              clickPos,
+              selectionBoxRadius,
+              setInfoPopupStatus
+            );
+            hideSelectionPopup();
+          }}
+          isPopup={isPopup}
+          position={popupPos}
+          hidePopup={hideSelectionPopup}
+        />
       )}
     </React.Fragment>
   );
@@ -215,84 +196,78 @@ function useInfoPopupStatus() {
   return [infoPopupStatus, setInfoPopupStatus];
 }
 
-function useFoundChars() {
-  const [foundChars, setFoundChars] = useState([]);
+async function validate(
+  level,
+  char,
+  foundChars,
+  clickPos,
+  selectionBoxRadius,
+  setInfoPopupStatus,
+  setFoundChars
+) {
+  const answers = await pullAnswers(level);
+  const [answerX, answerY] = answers[char];
+  const [clickX, clickY] = clickPos;
 
-  return { foundChars, setFoundChars, validate };
+  const selectionRange = {
+    xMin: clickX - selectionBoxRadius,
+    xMax: clickX + selectionBoxRadius,
+    yMin: clickY - selectionBoxRadius,
+    yMax: clickY + selectionBoxRadius,
+  };
 
-  async function validate(
-    level,
-    char,
-    clickPos,
-    selectionBoxRadius,
-    setInfoPopupStatus
-  ) {
-    const answers = await pullAnswers(level);
-    const [answerX, answerY] = answers[char];
-    const [clickX, clickY] = clickPos;
+  if (
+    isInBetween(selectionRange.xMin, selectionRange.xMax, answerX) &&
+    isInBetween(selectionRange.yMin, selectionRange.yMax, answerY)
+  )
+    return onValidCheck(true);
 
-    const selectionRange = {
-      xMin: clickX - selectionBoxRadius,
-      xMax: clickX + selectionBoxRadius,
-      yMin: clickY - selectionBoxRadius,
-      yMax: clickY + selectionBoxRadius,
-    };
+  return onValidCheck(false);
 
-    if (
-      isInBetween(selectionRange.xMin, selectionRange.xMax, answerX) &&
-      isInBetween(selectionRange.yMin, selectionRange.yMax, answerY)
-    )
-      return onValidCheck(true);
+  // helper functions
+  function isInBetween(min, max, num) {
+    return num >= min && num <= max;
+  }
 
-    return onValidCheck(false);
-
-    // helper functions
-    function isInBetween(min, max, num) {
-      return num >= min && num <= max;
+  function onValidCheck(isValid) {
+    if (foundChars.includes(char)) isValid = 'found';
+    const name = capitalizeFirstLetter(char);
+    let msg;
+    let icon;
+    switch (isValid) {
+      case true:
+        msg = `You found ${name}!`;
+        icon = 'flaticon-draw-check-mark';
+        break;
+      case false:
+        msg = `Woops! ${name} isn't there. Try
+      again.`;
+        icon = 'flaticon-close';
+        break;
+      case 'found':
+        msg = `You've already found ${name}!`;
+        icon = '';
+        break;
     }
-
-    function onValidCheck(isValid) {
-      if (foundChars.includes(char)) isValid = 'found';
-      const name = capitalizeFirstLetter(char);
-      let msg;
-      let icon;
-      switch (isValid) {
-        case true:
-          msg = `You found ${name}!`;
-          icon = 'flaticon-draw-check-mark';
-          break;
-        case false:
-          msg = `Woops! ${name} isn't there. Try
-        again.`;
-          icon = 'flaticon-close';
-          break;
-        case 'found':
-          msg = `You've already found ${name}!`;
-          icon = '';
-          break;
-      }
-      setInfoPopupStatus({
-        isShow: true,
-        msg,
-        icon,
-      });
-      if (!foundChars.includes(char)) setFoundChars((prev) => [...prev, char]);
-    }
+    setInfoPopupStatus({
+      isShow: true,
+      msg,
+      icon,
+    });
+    if (!foundChars.includes(char)) setFoundChars((prev) => [...prev, char]);
   }
 }
 
-function useIsGameOver(timer, setIsEndgamePopup) {
+function useIsGameOver(setIsEndgamePopup) {
   const [isGameOver, setIsGameOver] = useState(false);
-  const [endTime, setEndTime] = useState();
 
   useEffect(() => {
     if (isGameOver) {
-      setEndTime(timer);
       setIsEndgamePopup(true);
     }
   }, [isGameOver]);
 
-  return { isGameOver, setIsGameOver, endTime };
+  return { isGameOver, setIsGameOver };
 }
 
 /// /////////////
