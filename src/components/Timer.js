@@ -8,6 +8,7 @@ import '../styles/Timer.css';
 const Timer = ({ timer, setTimer, isGameOver }) => {
   const [startTime, setStartTime] = useState(Date.now());
 
+  // need this otherwise, React performs state update when unmounted
   let isMounted = true;
   useEffect(() => () => {
     isMounted = false;

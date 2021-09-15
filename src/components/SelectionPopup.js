@@ -7,22 +7,12 @@ import SelectionBox from './SelectionBox';
 
 import { levels } from '../imgSrc';
 
-const SelectionPopup = ({
-  level,
-  isPopup,
-  position,
-  hideSelectionPopup,
-  validate,
-}) => {
+const SelectionPopup = ({ level, isPopup, position, hidePopup, validate }) => {
   const modalStyle = useSpring({ opacity: isPopup ? 1 : 0 });
 
   const selectionBoxRadius = 55;
   return (
-    <animated.div
-      className="modal"
-      style={modalStyle}
-      onClick={hideSelectionPopup}
-    >
+    <animated.div className="modal" style={modalStyle} onClick={hidePopup}>
       <div
         id="selection"
         style={{
@@ -44,7 +34,7 @@ SelectionPopup.propTypes = {
   level: PropTypes.number,
   isPopup: PropTypes.bool,
   position: PropTypes.object,
-  hideSelectionPopup: PropTypes.func,
+  hidePopup: PropTypes.func,
   validate: PropTypes.func,
 };
 

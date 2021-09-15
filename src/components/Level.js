@@ -95,9 +95,11 @@ const Level = ({ level, goBack }) => {
             validate(
               level,
               char,
+              foundChars,
               clickPos,
               selectionBoxRadius,
-              setInfoPopupStatus
+              setInfoPopupStatus,
+              setFoundChars
             );
             hideSelectionPopup();
           }}

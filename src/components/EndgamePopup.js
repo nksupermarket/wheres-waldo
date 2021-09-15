@@ -17,7 +17,6 @@ const EndgamePopup = ({
   const [isError, setIsError] = useState(false);
   const inputRef = useRef();
 
-  console.log(pullLeaderboard);
   useEffect(async function () {
     if (!isError)
       setPlace(await getPlace(level, time, setInfoPopupStatus, setIsError));

@@ -32,10 +32,10 @@ const LevelSelectSlide = ({
 };
 
 LevelSelectSlide.propTypes = {
-  frameWidth: PropTypes.string,
+  frameWidth: PropTypes.number,
   bestTime: PropTypes.string,
   charList: PropTypes.array,
-  img: PropTypes.img,
+  img: PropTypes.string,
   isVisible: PropTypes.bool,
 };
 
