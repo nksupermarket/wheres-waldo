@@ -15,7 +15,6 @@ const Nav = ({
   setIsGameOver,
   timer,
   setTimer,
-  reset,
 }) => {
   const [isTooltip, setIsTooltip] = useState(false);
 
@@ -55,7 +54,6 @@ Nav.propTypes = {
   setIsGameOver: PropTypes.func,
   timer: PropTypes.number,
   setTimer: PropTypes.func,
-  reset: PropTypes.func,
 };
 
 export default Nav;

@@ -4,6 +4,7 @@ import LevelSelection from './components/LevelSelect/LevelSelection';
 import Level from './components/Level';
 
 import './globalStyles.css';
+import './assets/icons/font/flaticon.css';
 
 function App() {
   const [level, setLevel] = useState();

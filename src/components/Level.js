@@ -91,6 +91,7 @@ const Level = ({ level, goBack }) => {
       {isPopup && (
         <SelectionPopup
           level={level}
+          foundChars={foundChars}
           validate={(char, selectionBoxRadius) => {
             validate(
               level,
@@ -256,7 +257,8 @@ async function validate(
       msg,
       icon,
     });
-    if (!foundChars.includes(char)) setFoundChars((prev) => [...prev, char]);
+    if (isValid && !foundChars.includes(char))
+      setFoundChars((prev) => [...prev, char]);
   }
 }
 
