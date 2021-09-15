@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/wheres-waldo/static/css/main.c1febfc7.chunk.css",
-    "main.js": "/wheres-waldo/static/js/main.075b7772.chunk.js",
-    "main.js.map": "/wheres-waldo/static/js/main.075b7772.chunk.js.map",
+    "main.js": "/wheres-waldo/static/js/main.bcfc95a3.chunk.js",
+    "main.js.map": "/wheres-waldo/static/js/main.bcfc95a3.chunk.js.map",
     "runtime-main.js": "/wheres-waldo/static/js/runtime-main.79a09a4b.js",
     "runtime-main.js.map": "/wheres-waldo/static/js/runtime-main.79a09a4b.js.map",
     "static/js/2.723c4449.chunk.js": "/wheres-waldo/static/js/2.723c4449.chunk.js",
@@ -14,7 +14,7 @@
     "static/media/dog.556b0530.png": "/wheres-waldo/static/media/dog.556b0530.png",
     "static/media/evil_waldo.792cf427.png": "/wheres-waldo/static/media/evil_waldo.792cf427.png",
     "static/media/gf.0cb89a79.png": "/wheres-waldo/static/media/gf.0cb89a79.png",
-    "static/media/opt_1*7v_75ZGg1CTmWAw1rEgMHQ.220971a1.jpeg": "/wheres-waldo/static/media/opt_1*7v_75ZGg1CTmWAw1rEgMHQ.220971a1.jpeg",
+    "static/media/opt_wheres-waldo-0.220971a1.jpeg": "/wheres-waldo/static/media/opt_wheres-waldo-0.220971a1.jpeg",
     "static/media/opt_wheres-waldo-1.a7ef3e57.jpeg": "/wheres-waldo/static/media/opt_wheres-waldo-1.a7ef3e57.jpeg",
     "static/media/opt_wheres-waldo-2.da0205ae.jpeg": "/wheres-waldo/static/media/opt_wheres-waldo-2.da0205ae.jpeg",
     "static/media/opt_wheres-waldo-3.270d0889.jpeg": "/wheres-waldo/static/media/opt_wheres-waldo-3.270d0889.jpeg",
@@ -28,6 +28,6 @@
     "static/js/runtime-main.79a09a4b.js",
     "static/js/2.723c4449.chunk.js",
     "static/css/main.c1febfc7.chunk.css",
-    "static/js/main.075b7772.chunk.js"
+    "static/js/main.bcfc95a3.chunk.js"
   ]
 }
