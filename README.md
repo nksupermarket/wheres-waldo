@@ -1,4 +1,4 @@
-#where's waldo  
+where's waldo  
 ---
 Live demo : https://lookingcoolonavespa.github.io/wheres-waldo/
 
