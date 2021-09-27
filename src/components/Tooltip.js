@@ -12,7 +12,7 @@ const Tooltip = ({ close }) => {
     if (!tooltipRef.current) return;
 
     const width = tooltipRef.current.offsetWidth;
-    const trianglePos = 15; // in %, the value of 'left' styling of tooltip:before aka the little triangle thing
+    const trianglePos = window.offsetWidth > 450 ? 15 : 35; // in %, the value of 'left' styling of tooltip:before aka the little triangle thing
     const btnRadius = 15; // in px,
 
     setPxToShift(`-${(width * trianglePos) / 100 - btnRadius}px`);

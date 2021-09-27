@@ -32,3 +32,9 @@
   transform: rotate(45deg);
   z-index: 1;
 }
+
+@media screen and (max-width: 450px) {
+  .tooltip:before {
+    left: 35%;
+  }
+}

@@ -96,14 +96,15 @@
 .preview-img {
   margin: 20px 0;
 }
-/* #level-selection-ctn .char-list {
-  position: absolute;
-  bottom: -75px;
-  left: 50%;
-  transform: translateX(-50%);
-} */
 .char-list img {
   display: inline-block;
   height: 30px;
   margin-right: 5px;
+}
+
+@media (max-width: 500px) {
+  #level-selection-ctn {
+    width: 100%;
+    min-width: 0;
+  }
 }
