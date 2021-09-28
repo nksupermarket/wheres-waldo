@@ -21,9 +21,9 @@ const Level = ({ level, goBack }) => {
 
   const [foundChars, setFoundChars] = useState([]);
 
-  const { selectionStatus, showSelectionPopup, hideSelectionPopup } =
-    useSelectionStatus();
-  const { isPopup, popupPos, clickPos } = selectionStatus;
+  const { selectPopupStatus, showSelectionPopup, hideSelectionPopup } =
+    useSelectPopupStatus();
+  const { isPopup, popupPos, clickPos } = selectPopupStatus;
 
   const [isEndgamePopup, setIsEndgamePopup] = useState(false);
   const { isGameOver, setIsGameOver } = useIsGameOver(setIsEndgamePopup);
@@ -37,6 +37,7 @@ const Level = ({ level, goBack }) => {
     if (isGameOver)
       ctnRef.current.removeEventListener('dblclick', showSelectionPopup);
   }, [isGameOver]);
+
   useEffect(() => {
     ctnRef.current.addEventListener('mousedown', (e) =>
       dragToScroll.mouseDownHandler(e, ctnRef)
@@ -50,7 +51,7 @@ const Level = ({ level, goBack }) => {
     ctnRef.current.addEventListener('mouseleave', () =>
       dragToScroll.mouseLeaveHandler(ctnRef)
     );
-  });
+  }, []);
 
   function reset() {
     setIsNewGamePopup(false);
@@ -160,13 +161,13 @@ const dragToScroll = {
 // Custom Hooks//
 /// /////////////
 
-function useSelectionStatus() {
-  const [selectionStatus, setPopupStatus] = useState({});
+function useSelectPopupStatus() {
+  const [selectPopupStatus, setSelectPopupStatus] = useState({});
 
-  return { selectionStatus, showSelectionPopup, hideSelectionPopup };
+  return { selectPopupStatus, showSelectionPopup, hideSelectionPopup };
 
   function showSelectionPopup(e) {
-    setPopupStatus({
+    setSelectPopupStatus({
       isPopup: true,
       popupPos: { x: e.clientX, y: e.clientY },
       clickPos: [e.layerX, e.layerY],
@@ -174,7 +175,7 @@ function useSelectionStatus() {
   }
 
   function hideSelectionPopup() {
-    setPopupStatus((prev) => ({ ...prev, isPopup: false }));
+    setSelectPopupStatus((prev) => ({ ...prev, isPopup: false }));
   }
 }
 

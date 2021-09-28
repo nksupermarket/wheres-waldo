@@ -19,6 +19,8 @@ const LevelSelectSliderFrame = ({ slide, slideProps, btnRef, setLevel }) => {
   useEffect(async function () {
     const leaderboard = await pullLeaderboard();
     setLeaderboard(leaderboard);
+
+    return () => setLeaderboard();
   }, []);
 
   return (

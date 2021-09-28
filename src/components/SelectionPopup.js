@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSpring, animated } from 'react-spring';
 import PropTypes from 'prop-types';
 
@@ -6,7 +6,6 @@ import CharPopup from './CharPopup';
 import SelectionBox from './SelectionBox';
 
 import { levels } from '../imgSrc';
-import { useEffect } from 'react/cjs/react.development';
 
 const SelectionPopup = ({
   level,
@@ -21,7 +20,6 @@ const SelectionPopup = ({
   const [charPopupStyle, setCharPopupStyle] = useState({});
   const modalRef = useRef();
   const dropdownRef = useRef();
-
   useEffect(() => {
     if (
       position.y + dropdownRef.current.offsetHeight >
@@ -34,7 +32,7 @@ const SelectionPopup = ({
       modalRef.current.offsetWidth
     )
       setCharPopupStyle((prev) => ({ ...prev, left: '-50px' }));
-  });
+  }, [position]);
 
   const selectionBoxRadius = 55;
   return (

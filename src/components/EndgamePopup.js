@@ -107,7 +107,6 @@ async function onSubmit(
   showNewGamePopup
 ) {
   const username = inputRef.value || 'Anonymous';
-  console.log(username);
   try {
     const leaderboard = await sortNewLeaderboard(level, time, username);
     await updateLeaderboard(level, leaderboard);
