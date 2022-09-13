@@ -236,8 +236,6 @@ async function validate(
     yMax: clickY + selectionBoxRadius,
   };
 
-  console.log(clickX, clickY, answerX, answerY);
-
   if (
     isInBetween(selectionRange.xMin, selectionRange.xMax, answerX) &&
     isInBetween(selectionRange.yMin, selectionRange.yMax, answerY)
