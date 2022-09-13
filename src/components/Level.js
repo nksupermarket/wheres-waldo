@@ -15,8 +15,16 @@ import { levels } from '../imgSrc';
 import '../styles/Level.css';
 
 const Level = ({ level, goBack }) => {
+  const ctnRef = useRef();
+
   const [timer, setTimer] = useState(0);
 
+  const {
+    mouseDownHandler,
+    mouseLeaveHandler,
+    mouseMoveHandler,
+    mouseUpHandler,
+  } = useScroll();
   const [infoPopupStatus, setInfoPopupStatus] = useInfoPopupStatus();
 
   const [foundChars, setFoundChars] = useState([]);
@@ -30,26 +38,29 @@ const Level = ({ level, goBack }) => {
 
   const [isNewGamePopup, setIsNewGamePopup] = useState(false);
 
-  const ctnRef = useRef();
   useEffect(() => {
-    ctnRef.current.addEventListener('dblclick', showSelectionPopup);
+    function showCharPopup(e) {
+      showSelectionPopup(e, ctnRef.current);
+    }
+
+    ctnRef.current.addEventListener('dblclick', showCharPopup);
 
     if (isGameOver)
-      ctnRef.current.removeEventListener('dblclick', showSelectionPopup);
+      ctnRef.current.removeEventListener('dblclick', showCharPopup);
   }, [isGameOver]);
 
   useEffect(() => {
     ctnRef.current.addEventListener('mousedown', (e) =>
-      dragToScroll.mouseDownHandler(e, ctnRef)
+      mouseDownHandler(e, ctnRef.current)
     );
     ctnRef.current.addEventListener('mousemove', (e) =>
-      dragToScroll.mouseMoveHandler(e, ctnRef)
+      mouseMoveHandler(e, ctnRef.current)
     );
     ctnRef.current.addEventListener('mouseup', () =>
-      dragToScroll.mouseUpHandler(ctnRef)
+      mouseUpHandler(ctnRef.current)
     );
     ctnRef.current.addEventListener('mouseleave', () =>
-      dragToScroll.mouseLeaveHandler(ctnRef)
+      mouseLeaveHandler(ctnRef.current)
     );
   }, []);
 
@@ -120,57 +131,62 @@ Level.propTypes = {
 
 export default Level;
 
-const dragToScroll = {
-  startPos: { top: 0, left: 0, x: 0, y: 0 },
-  isDown: false,
-  mouseDownHandler: (e, ctnRef) => {
-    e.preventDefault();
-    // get current position
-    dragToScroll.startPos = {
-      top: ctnRef.current.scrollTop,
-      left: ctnRef.current.scrollLeft,
-      x: e.clientX,
-      y: e.clientY,
-    };
-    ctnRef.current.style.cursor = 'grabbing';
-
-    dragToScroll.isDown = true;
-  },
-  mouseMoveHandler: (e, ctnRef) => {
-    // see how far the mouse has moved
-    // use scrollLeft + scrollTop to move
-    e.preventDefault();
-    if (!dragToScroll.isDown) return;
-
-    const dx = e.clientX - dragToScroll.startPos.x;
-    const dy = e.clientY - dragToScroll.startPos.y;
-    ctnRef.current.scrollLeft = dragToScroll.startPos.left - dx;
-    ctnRef.current.scrollTop = dragToScroll.startPos.top - dy;
-  },
-  mouseUpHandler: (ctnRef) => {
-    dragToScroll.isDown = false;
-    ctnRef.current.style.cursor = 'grab';
-  },
-  mouseLeaveHandler: (ctnRef) => {
-    dragToScroll.isDown = false;
-    ctnRef.current.style.cursor = 'grab';
-  },
-};
-
 /// /////////////
 // Custom Hooks//
 /// /////////////
+
+function useScroll() {
+  // const [position, setPosition] = useState({ top: 0, left: 0, x: 0, y: 0 });
+  const position = useRef({ top: 0, left: 0, x: 0, y: 0 });
+  const mouseDown = useRef(false);
+
+  return {
+    position,
+    mouseDownHandler: (e, ctn) => {
+      e.preventDefault();
+      // get current position
+      position.current = {
+        top: ctn.scrollTop,
+        left: ctn.scrollLeft,
+        x: e.clientX,
+        y: e.clientY,
+      };
+      ctn.style.cursor = 'grabbing';
+
+      mouseDown.current = true;
+    },
+    mouseMoveHandler: (e, ctn) => {
+      // see how far the mouse has moved
+      // use scrollLeft + scrollTop to move
+      e.preventDefault();
+      if (!mouseDown.current) return;
+
+      const dx = e.clientX - position.current.x;
+      const dy = e.clientY - position.current.y;
+      ctn.scrollLeft = position.current.left - dx;
+      ctn.scrollTop = position.current.top - dy;
+    },
+    mouseUpHandler: (ctn) => {
+      mouseDown.current = false;
+      ctn.style.cursor = 'grab';
+    },
+    mouseLeaveHandler: (ctn) => {
+      mouseDown.current = false;
+      ctn.style.cursor = 'grab';
+    },
+  };
+}
 
 function useSelectPopupStatus() {
   const [selectPopupStatus, setSelectPopupStatus] = useState({});
 
   return { selectPopupStatus, showSelectionPopup, hideSelectionPopup };
 
-  function showSelectionPopup(e) {
+  function showSelectionPopup(e, ctn) {
     setSelectPopupStatus({
       isPopup: true,
       popupPos: { x: e.clientX, y: e.clientY },
-      clickPos: [e.layerX, e.layerY],
+      clickPos: [ctn.scrollLeft + e.clientX, ctn.scrollTop + e.clientY],
     });
   }
 
@@ -219,6 +235,8 @@ async function validate(
     yMin: clickY - selectionBoxRadius,
     yMax: clickY + selectionBoxRadius,
   };
+
+  console.log(clickX, clickY, answerX, answerY);
 
   if (
     isInBetween(selectionRange.xMin, selectionRange.xMax, answerX) &&
